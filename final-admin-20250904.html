@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>最終管理画面 - 2025/09/04</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+</head>
+<body>
+
+<div style="font-family:Arial,sans-serif;padding:20px;background:#f5f5f5;min-height:100vh;">
+  <h1 style="text-align:center;color:#2c5f2d;margin-bottom:30px;">🍞 店舗管理システム - 最終版</h1>
+  <div id="message" style="text-align:center;font-size:18px;padding:20px;background:#fff;border-radius:8px;margin-bottom:20px;">
+    システム初期化中...
+  </div>
+  <div id="content" style="max-width:1200px;margin:0 auto;"></div>
+</div>
+
+<script type="text/javascript">
+(function() {
+  console.log('=== 最終管理システム開始 2025/09/04 ===');
+  
+  var messageEl = document.getElementById('message');
+  var contentEl = document.getElementById('content');
+  
+  function updateMessage(text) {
+    console.log('メッセージ:', text);
+    messageEl.innerHTML = text;
+  }
+  
+  function showError(error) {
+    console.error('エラー:', error);
+    updateMessage('❌ エラー: ' + error);
+  }
+  
+  function loadShops() {
+    updateMessage('🔄 店舗データを読み込み中...');
+    
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'https://gf-fes-api.bettger1000.workers.dev/api/shops', true);
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+          try {
+            var shops = JSON.parse(xhr.responseText);
+            console.log('取得成功:', shops.length, '件の店舗');
+            displayShops(shops);
+          } catch (e) {
+            showError('JSONパースエラー: ' + e.message);
+          }
+        } else {
+          showError('API呼び出しエラー: HTTP ' + xhr.status);
+        }
+      }
+    };
+    xhr.send();
+  }
+  
+  function displayShops(shops) {
+    if (!shops || shops.length === 0) {
+      showError('店舗データが空です');
+      return;
+    }
+    
+    updateMessage('✅ ' + shops.length + '件の店舗を表示中');
+    
+    var html = '';
+    for (var i = 0; i < shops.length; i++) {
+      var shop = shops[i];
+      console.log('店舗 ' + (i+1) + ':', shop.name);
+      
+      html += '<div style="background:white;border:2px solid #ddd;margin:15px 0;padding:20px;border-radius:10px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">';
+      html += '<h2 style="color:#2c5f2d;margin:0 0 15px 0;font-size:24px;">' + (shop.name || '名称未設定') + '</h2>';
+      
+      html += '<div style="margin:8px 0;font-size:16px;color:#555;">';
+      html += '<strong>📍 住所:</strong> ' + (shop.address || '住所未設定');
+      html += '</div>';
+      
+      if (shop.category && Array.isArray(shop.category)) {
+        html += '<div style="margin:8px 0;font-size:16px;color:#555;">';
+        html += '<strong>🏷️ カテゴリ:</strong> ' + shop.category.join(', ');
+        html += '</div>';
+      }
+      
+      if (shop.targetCustomer) {
+        html += '<div style="margin:8px 0;font-size:16px;color:#555;">';
+        html += '<strong>🎯 対象顧客:</strong> ' + shop.targetCustomer;
+        html += '</div>';
+      }
+      
+      if (shop.concept) {
+        html += '<div style="background:#f0f8f0;padding:15px;margin:15px 0;border-radius:8px;border-left:4px solid #2c5f2d;">';
+        html += '<strong>💡 コンセプト:</strong><br>' + shop.concept;
+        html += '</div>';
+      }
+      
+      html += '</div>';
+    }
+    
+    contentEl.innerHTML = html;
+    console.log('✅ 全店舗表示完了');
+  }
+  
+  // ページ読み込み完了後に実行
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadShops);
+  } else {
+    loadShops();
+  }
+})();
+</script>
+
+</body>
+</html>
