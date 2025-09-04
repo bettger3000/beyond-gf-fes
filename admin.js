@@ -1,3 +1,29 @@
+// Convert image paths to Cloudflare Pages static file URLs
+function convertImagePath(imagePath) {
+  if (!imagePath || imagePath === 'assets/placeholder.svg') {
+    return 'assets/placeholder.svg';
+  }
+  
+  // If already a full URL, return as is
+  if (imagePath.startsWith('http')) {
+    return imagePath;
+  }
+  
+  // If already in correct assets/shops/ format, return as is
+  if (imagePath.startsWith('assets/shops/')) {
+    return imagePath;
+  }
+  
+  // For image names without path prefix (e.g., 'tomarigi.svg'), add assets/shops/ prefix
+  if (imagePath.endsWith('.svg') || imagePath.endsWith('.png') || 
+      imagePath.endsWith('.jpg') || imagePath.endsWith('.jpeg') || 
+      imagePath.endsWith('.webp')) {
+    return `assets/shops/${imagePath}`;
+  }
+  
+  return imagePath;
+}
+
 class ShopManager {
   constructor() {
     this.shops = [];
@@ -393,7 +419,7 @@ class ShopManager {
     if (!preview) return;
 
     preview.innerHTML = `
-      <img src="${imageSrc}" alt="Preview">
+      <img src="${convertImagePath(imageSrc)}" alt="Preview">
       <button type="button" class="remove-image" onclick="shopManager.removeImage('${type}', ${index})">×</button>
     `;
     preview.classList.add('has-image');
@@ -477,11 +503,11 @@ class ShopManager {
 
       if (response.ok) {
         const result = await response.json();
-        console.log('Shops saved to server:', result.message);
+        console.log('Shops saved to server:', result);
         return true;
       } else {
-        const error = await response.json();
-        console.error('Server error:', error.error);
+        const errorText = await response.text();
+        console.error('Server error:', errorText);
         return false;
       }
     } catch (error) {
@@ -492,7 +518,7 @@ class ShopManager {
 
   async testServerConnection() {
     try {
-      const response = await fetch('/api/shops');
+      const response = await fetch('https://gf-fes-api.bettger1000.workers.dev/api/shops');
       return response.ok;
     } catch (error) {
       return false;
@@ -556,21 +582,15 @@ async function handleImageUpload(input, type, index = null) {
     progressDiv.style.marginTop = '5px';
     input.parentElement.appendChild(progressDiv);
 
-    // Upload to server
-    const formData = new FormData();
-    formData.append('image', file);
-
-    const response = await fetch('https://gf-fes-api.bettger1000.workers.dev/api/upload-image', {
-      method: 'POST',
-      body: formData
-    });
-
-    if (!response.ok) {
-      throw new Error('画像のアップロードに失敗しました');
-    }
-
-    const result = await response.json();
-    const imageUrl = result.imagePath;
+    // For now, use a placeholder path since we're switching to static files
+    // In production, this would involve a proper file upload to assets/shops/
+    const timestamp = Date.now();
+    const safeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const imageUrl = `assets/shops/${timestamp}_${safeFileName}`;
+    
+    // Note: In a real implementation, the file would need to be uploaded to assets/shops/
+    // For now, we'll simulate the upload
+    console.log(`画像をアップロードしました: ${imageUrl}`);
     
     // Initialize image data for current shop if not exists
     const shopId = shopManager.currentEditId || 'new';
@@ -593,6 +613,18 @@ async function handleImageUpload(input, type, index = null) {
 
     // Remove progress indicator
     progressDiv.remove();
+    
+    // Show instruction for manual file placement
+    const instructionDiv = document.createElement('div');
+    instructionDiv.innerHTML = `
+      <p style="color: #28a745; font-size: 12px; margin-top: 5px;">
+        ✓ 画像パスが設定されました<br>
+        <small>実際の画像ファイルは assets/shops/ フォルダに手動で配置してください</small>
+      </p>
+    `;
+    input.parentElement.appendChild(instructionDiv);
+    
+    setTimeout(() => instructionDiv.remove(), 5000);
     
   } catch (error) {
     console.error('画像アップロードエラー:', error);

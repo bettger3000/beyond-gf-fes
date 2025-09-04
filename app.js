@@ -9,7 +9,7 @@ const state = {
   currentImageIndex: 0
 };
 
-// Convert local image paths to Cloudflare R2 URLs
+// Convert image paths to Cloudflare Pages static file URLs
 function convertImagePath(imagePath) {
   if (!imagePath || imagePath === 'assets/placeholder.svg') {
     return 'assets/placeholder.svg';
@@ -20,10 +20,16 @@ function convertImagePath(imagePath) {
     return imagePath;
   }
   
-  // Convert assets/shops/ paths to R2 API
+  // If already in correct assets/shops/ format, return as is
   if (imagePath.startsWith('assets/shops/')) {
-    const filename = imagePath.replace('assets/shops/', '');
-    return `https://gf-fes-api.bettger1000.workers.dev/api/image/${filename}`;
+    return imagePath;
+  }
+  
+  // For image names without path prefix (e.g., 'tomarigi.svg'), add assets/shops/ prefix
+  if (imagePath.endsWith('.svg') || imagePath.endsWith('.png') || 
+      imagePath.endsWith('.jpg') || imagePath.endsWith('.jpeg') || 
+      imagePath.endsWith('.webp')) {
+    return `assets/shops/${imagePath}`;
   }
   
   return imagePath;

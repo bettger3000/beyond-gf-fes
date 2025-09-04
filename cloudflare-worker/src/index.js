@@ -32,6 +32,12 @@ export default {
         return await uploadImage(request, env, corsHeaders);
       }
 
+      // Serve CSS files
+      if (url.pathname === '/styles.css' || url.pathname.endsWith('.css')) {
+        const filename = url.pathname.substring(1); // Remove leading slash
+        return await getStaticFile(filename, env, corsHeaders);
+      }
+
       return new Response('Not Found', { status: 404, headers: corsHeaders });
     } catch (error) {
       console.error('Worker error:', error);
@@ -49,22 +55,22 @@ async function getShops(env, corsHeaders) {
     const shops = result.results.map(shop => ({
       id: shop.id,
       name: shop.name,
-      category: shop.category ? JSON.parse(shop.category) : null,
-      tags: shop.tags ? JSON.parse(shop.tags) : null,
-      short: shop.short,
-      concept: shop.concept,
-      desc: shop.desc,
-      targetCustomer: shop.targetCustomer,
-      story: shop.story,
-      recommendation: shop.recommendation,
-      allergyInfo: shop.allergyInfo ? JSON.parse(shop.allergyInfo) : null,
-      contamination: shop.contamination,
-      menu: shop.menu ? JSON.parse(shop.menu) : null,
-      address: shop.address,
-      googleMaps: shop.googleMaps,
-      links: shop.links ? JSON.parse(shop.links) : null,
-      thumb: shop.thumb,
-      photos: shop.photos ? JSON.parse(shop.photos) : null
+      category: shop.category ? JSON.parse(shop.category) : [],
+      tags: shop.tags ? JSON.parse(shop.tags) : [],
+      short: shop.short || '',
+      concept: shop.concept || '',
+      desc: shop.desc || '',
+      targetCustomer: shop.targetCustomer || '',
+      story: shop.story || '',
+      recommendation: shop.recommendation || '',
+      allergyInfo: shop.allergyInfo ? JSON.parse(shop.allergyInfo) : [],
+      contamination: shop.contamination || '',
+      menu: shop.menu ? JSON.parse(shop.menu) : [],
+      address: shop.address || '',
+      googleMaps: shop.googleMaps || '',
+      links: shop.links ? JSON.parse(shop.links) : {},
+      thumb: shop.thumb || '',
+      photos: shop.photos ? JSON.parse(shop.photos) : []
     }));
 
     return new Response(JSON.stringify(shops), {
@@ -72,7 +78,10 @@ async function getShops(env, corsHeaders) {
     });
   } catch (error) {
     console.error('Database error:', error);
-    return new Response('Database Error', { status: 500, headers: corsHeaders });
+    return new Response(JSON.stringify({ error: 'Database Error' }), { 
+      status: 500, 
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
   }
 }
 
@@ -91,22 +100,22 @@ async function updateShops(request, env, corsHeaders) {
       `).bind(
         shop.id,
         shop.name,
-        JSON.stringify(shop.category),
-        JSON.stringify(shop.tags),
+        shop.category ? JSON.stringify(shop.category) : null,
+        shop.tags ? JSON.stringify(shop.tags) : null,
         shop.short,
         shop.concept,
         shop.desc,
         shop.targetCustomer,
         shop.story,
         shop.recommendation,
-        JSON.stringify(shop.allergyInfo),
+        shop.allergyInfo ? JSON.stringify(shop.allergyInfo) : null,
         shop.contamination,
-        JSON.stringify(shop.menu),
+        shop.menu ? JSON.stringify(shop.menu) : null,
         shop.address,
         shop.googleMaps,
-        JSON.stringify(shop.links),
+        shop.links ? JSON.stringify(shop.links) : null,
         shop.thumb,
-        JSON.stringify(shop.photos)
+        shop.photos ? JSON.stringify(shop.photos) : null
       ).run();
     }
 
@@ -126,9 +135,21 @@ async function getImage(filename, env, corsHeaders) {
       return new Response('Image not found', { status: 404, headers: corsHeaders });
     }
 
+    // Determine correct content type based on filename
+    let contentType = object.httpMetadata?.contentType || 'image/jpeg';
+    if (filename.endsWith('.svg')) {
+      contentType = 'image/svg+xml';
+    } else if (filename.endsWith('.png')) {
+      contentType = 'image/png';
+    } else if (filename.endsWith('.webp')) {
+      contentType = 'image/webp';
+    } else if (filename.endsWith('.jpeg') || filename.endsWith('.jpg')) {
+      contentType = 'image/jpeg';
+    }
+
     const headers = {
       ...corsHeaders,
-      'Content-Type': object.httpMetadata?.contentType || 'image/jpeg',
+      'Content-Type': contentType,
       'Cache-Control': 'public, max-age=86400'
     };
 
@@ -157,6 +178,7 @@ async function uploadImage(request, env, corsHeaders) {
 
     return new Response(JSON.stringify({ 
       filename,
+      imagePath: filename,
       url: `/api/image/${filename}`
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -164,5 +186,34 @@ async function uploadImage(request, env, corsHeaders) {
   } catch (error) {
     console.error('Upload error:', error);
     return new Response('Upload Error', { status: 500, headers: corsHeaders });
+  }
+}
+
+async function getStaticFile(filename, env, corsHeaders) {
+  try {
+    const object = await env.IMAGES.get(filename);
+    if (!object) {
+      return new Response('File not found', { status: 404, headers: corsHeaders });
+    }
+
+    let contentType = 'text/plain';
+    if (filename.endsWith('.css')) {
+      contentType = 'text/css';
+    } else if (filename.endsWith('.js')) {
+      contentType = 'application/javascript';
+    } else if (filename.endsWith('.html')) {
+      contentType = 'text/html';
+    }
+
+    const headers = {
+      ...corsHeaders,
+      'Content-Type': contentType,
+      'Cache-Control': 'public, max-age=86400'
+    };
+
+    return new Response(object.body, { headers });
+  } catch (error) {
+    console.error('Static file error:', error);
+    return new Response('File Error', { status: 500, headers: corsHeaders });
   }
 }
