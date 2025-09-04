@@ -1,4 +1,4 @@
-// Convert image paths to Cloudflare Pages static file URLs
+// Convert image paths to R2 bucket URLs via Worker API
 function convertImagePath(imagePath) {
   if (!imagePath || imagePath === 'assets/placeholder.svg') {
     return 'assets/placeholder.svg';
@@ -9,16 +9,11 @@ function convertImagePath(imagePath) {
     return imagePath;
   }
   
-  // If already in correct assets/shops/ format, return as is
-  if (imagePath.startsWith('assets/shops/')) {
-    return imagePath;
-  }
-  
-  // For image names without path prefix (e.g., 'tomarigi.svg'), add assets/shops/ prefix
+  // Convert to R2 API URL for uploaded images
   if (imagePath.endsWith('.svg') || imagePath.endsWith('.png') || 
       imagePath.endsWith('.jpg') || imagePath.endsWith('.jpeg') || 
       imagePath.endsWith('.webp')) {
-    return `assets/shops/${imagePath}`;
+    return `https://gf-fes-api.bettger1000.workers.dev/api/image/${imagePath}`;
   }
   
   return imagePath;
@@ -582,15 +577,21 @@ async function handleImageUpload(input, type, index = null) {
     progressDiv.style.marginTop = '5px';
     input.parentElement.appendChild(progressDiv);
 
-    // For now, use a placeholder path since we're switching to static files
-    // In production, this would involve a proper file upload to assets/shops/
-    const timestamp = Date.now();
-    const safeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const imageUrl = `assets/shops/${timestamp}_${safeFileName}`;
-    
-    // Note: In a real implementation, the file would need to be uploaded to assets/shops/
-    // For now, we'll simulate the upload
-    console.log(`画像をアップロードしました: ${imageUrl}`);
+    // Upload to R2 bucket via Worker API
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const response = await fetch('https://gf-fes-api.bettger1000.workers.dev/api/upload-image', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!response.ok) {
+      throw new Error('画像のアップロードに失敗しました');
+    }
+
+    const result = await response.json();
+    const imageUrl = result.imagePath;
     
     // Initialize image data for current shop if not exists
     const shopId = shopManager.currentEditId || 'new';
@@ -614,17 +615,16 @@ async function handleImageUpload(input, type, index = null) {
     // Remove progress indicator
     progressDiv.remove();
     
-    // Show instruction for manual file placement
-    const instructionDiv = document.createElement('div');
-    instructionDiv.innerHTML = `
+    // Show success message
+    const successDiv = document.createElement('div');
+    successDiv.innerHTML = `
       <p style="color: #28a745; font-size: 12px; margin-top: 5px;">
-        ✓ 画像パスが設定されました<br>
-        <small>実際の画像ファイルは assets/shops/ フォルダに手動で配置してください</small>
+        ✅ 画像のアップロードが完了しました！
       </p>
     `;
-    input.parentElement.appendChild(instructionDiv);
+    input.parentElement.appendChild(successDiv);
     
-    setTimeout(() => instructionDiv.remove(), 5000);
+    setTimeout(() => successDiv.remove(), 3000);
     
   } catch (error) {
     console.error('画像アップロードエラー:', error);

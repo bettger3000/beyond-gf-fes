@@ -89,13 +89,10 @@ async function updateShops(request, env, corsHeaders) {
   try {
     const shops = await request.json();
     
-    // Clear existing data
-    await env.DB.prepare('DELETE FROM shops').run();
-    
-    // Insert new data
+    // Use upsert (INSERT OR REPLACE) instead of DELETE + INSERT for safety
     for (const shop of shops) {
       await env.DB.prepare(`
-        INSERT INTO shops (id, name, category, tags, short, concept, desc, targetCustomer, story, recommendation, allergyInfo, contamination, menu, address, googleMaps, links, thumb, photos)
+        INSERT OR REPLACE INTO shops (id, name, category, tags, short, concept, desc, targetCustomer, story, recommendation, allergyInfo, contamination, menu, address, googleMaps, links, thumb, photos)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).bind(
         shop.id,
