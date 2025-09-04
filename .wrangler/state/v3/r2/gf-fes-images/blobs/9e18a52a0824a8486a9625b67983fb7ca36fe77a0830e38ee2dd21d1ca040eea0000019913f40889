@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#F4EDE4"/>
+  <circle cx="200" cy="150" r="60" fill="#4A5D4F" opacity="0.3"/>
+  <text x="200" y="175" font-family="'Noto Sans JP', sans-serif" font-size="20" fill="#2C2C2C" text-anchor="middle" font-weight="600">菜食食堂ととと</text>
+  <text x="200" y="205" font-family="'Noto Sans JP', sans-serif" font-size="14" fill="#6B6B6B" text-anchor="middle">大判お好み焼き</text>
+  <rect x="50" y="235" width="300" height="2" fill="#B8985A" opacity="0.5"/>
+  <text x="200" y="275" font-family="'Noto Sans JP', sans-serif" font-size="12" fill="#4A5D4F" text-anchor="middle">露店営業</text>
+</svg>

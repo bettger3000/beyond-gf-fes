@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>店舗管理画面 - ビヨンドグルテンフリー祭り</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-base: #F5F3F0;
+      --color-white: #FFFFFF;
+      --color-text: #2C2C2C;
+      --color-text-light: #6B6B6B;
+      --color-green: #4A5D4F;
+      --color-gold: #B8985A;
+      --color-accent: #D4634A;
+      --color-line: #E8E0D6;
+      --color-success: #22c55e;
+      --color-danger: #ef4444;
+      --font-serif: 'Noto Serif JP', serif;
+      --font-sans: 'Noto Sans JP', sans-serif;
+      --spacing-sm: 16px;
+      --spacing-md: 24px;
+      --spacing-lg: 32px;
+      --radius: 8px;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-base);
+      color: var(--color-text);
+      line-height: 1.6;
+    }
+
+    .header {
+      background: var(--color-white);
+      padding: var(--spacing-md);
+      box-shadow: var(--shadow);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .header h1 {
+      font-family: var(--font-serif);
+      color: var(--color-green);
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .nav {
+      display: flex;
+      gap: var(--spacing-sm);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      background: var(--color-green);
+      color: var(--color-white);
+      border: none;
+      padding: 12px 24px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .nav-btn:hover {
+      background: var(--color-gold);
+      transform: translateY(-2px);
+    }
+
+    .nav-btn.active {
+      background: var(--color-accent);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--spacing-md);
+    }
+
+    .section {
+      background: var(--color-white);
+      border-radius: var(--radius);
+      padding: var(--spacing-lg);
+      margin-bottom: var(--spacing-lg);
+      box-shadow: var(--shadow);
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .section h2 {
+      font-family: var(--font-serif);
+      color: var(--color-green);
+      margin-bottom: var(--spacing-md);
+      font-size: 1.5rem;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--color-text-light);
+    }
+
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: var(--spacing-md);
+    }
+
+    .shop-card {
+      border: 2px solid var(--color-line);
+      border-radius: var(--radius);
+      padding: var(--spacing-md);
+      transition: all 0.3s ease;
+      background: var(--color-white);
+    }
+
+    .shop-card:hover {
+      border-color: var(--color-gold);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .shop-name {
+      font-family: var(--font-serif);
+      font-size: 1.2rem;
+      color: var(--color-green);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .shop-info {
+      color: var(--color-text-light);
+      font-size: 0.9rem;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .shop-concept {
+      color: var(--color-text);
+      font-size: 0.85rem;
+      margin-top: 10px;
+      font-style: italic;
+    }
+
+    .image-preview {
+      max-width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: var(--radius);
+      margin: 10px 0;
+    }
+
+    .btn {
+      background: var(--color-green);
+      color: var(--color-white);
+      border: none;
+      padding: 10px 20px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 5px;
+    }
+
+    .btn:hover {
+      background: var(--color-gold);
+    }
+
+    .error {
+      background: #fee;
+      color: var(--color-danger);
+      padding: 20px;
+      border-radius: var(--radius);
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>店舗管理画面</h1>
+    <nav class="nav">
+      <button class="nav-btn active" data-section="list">店舗一覧</button>
+      <button class="nav-btn" data-section="export">データ出力</button>
+    </nav>
+  </div>
+
+  <div class="container">
+    <section id="list" class="section active">
+      <h2>登録済み店舗一覧</h2>
+      <div id="shopsList" class="shop-grid">
+        <div class="loading">店舗データを読み込み中...</div>
+      </div>
+    </section>
+
+    <section id="export" class="section">
+      <h2>データ出力</h2>
+      <p>店舗データをJSON形式で出力します。</p>
+      <button class="btn" onclick="exportData()">データを出力</button>
+    </section>
+  </div>
+
+  <script>
+    // グローバル変数
+    const API_BASE = 'https://gf-fes-api.bettger1000.workers.dev';
+    let allShops = [];
+
+    // ページ読み込み時の処理
+    window.addEventListener('DOMContentLoaded', function() {
+      console.log('管理画面初期化開始');
+      
+      // ナビゲーション設定
+      setupNavigation();
+      
+      // 店舗データ読み込み
+      loadShops();
+    });
+
+    // ナビゲーション設定
+    function setupNavigation() {
+      const buttons = document.querySelectorAll('.nav-btn');
+      buttons.forEach(btn => {
+        btn.addEventListener('click', function() {
+          const targetSection = this.dataset.section;
+          
+          // ボタンのアクティブ状態を更新
+          buttons.forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          
+          // セクション表示を更新
+          document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+          const section = document.getElementById(targetSection);
+          if (section) section.classList.add('active');
+        });
+      });
+    }
+
+    // 店舗データを読み込む
+    async function loadShops() {
+      const container = document.getElementById('shopsList');
+      
+      try {
+        console.log('APIから店舗データ取得開始:', API_BASE + '/api/shops');
+        
+        const response = await fetch(API_BASE + '/api/shops');
+        
+        if (!response.ok) {
+          throw new Error('データ取得失敗: ' + response.status);
+        }
+        
+        const shops = await response.json();
+        console.log('取得成功！店舗数:', shops.length);
+        console.log('店舗データ:', shops);
+        
+        allShops = shops;
+        displayShops(shops);
+        
+      } catch (error) {
+        console.error('店舗データ読み込みエラー:', error);
+        container.innerHTML = '<div class="error">店舗データの読み込みに失敗しました。<br>エラー: ' + error.message + '</div>';
+      }
+    }
+
+    // 店舗一覧を表示
+    function displayShops(shops) {
+      const container = document.getElementById('shopsList');
+      
+      if (!shops || shops.length === 0) {
+        container.innerHTML = '<div class="error">表示する店舗がありません。</div>';
+        return;
+      }
+      
+      const html = shops.map(shop => {
+        const categories = Array.isArray(shop.category) ? shop.category.join(', ') : '未設定';
+        const address = shop.address || '未設定';
+        const concept = shop.concept || '';
+        const thumb = shop.thumb ? convertImagePath(shop.thumb) : '';
+        
+        return `
+          <div class="shop-card">
+            <div class="shop-name">${shop.name || '名称未設定'}</div>
+            <div class="shop-info">
+              <strong>カテゴリ:</strong> ${categories}
+            </div>
+            <div class="shop-info">
+              <strong>住所:</strong> ${address}
+            </div>
+            ${concept ? '<div class="shop-concept">' + concept + '</div>' : ''}
+            ${thumb ? '<img src="' + thumb + '" class="image-preview" alt="' + shop.name + '" onerror="this.style.display=\'none\'">' : ''}
+          </div>
+        `;
+      }).join('');
+      
+      container.innerHTML = html;
+      console.log('店舗表示完了');
+    }
+
+    // 画像パス変換
+    function convertImagePath(imagePath) {
+      if (!imagePath) return '';
+      
+      // すでに完全なURLの場合
+      if (imagePath.startsWith('http')) {
+        return imagePath;
+      }
+      
+      // 画像ファイルの場合、R2 URLに変換
+      const imageExtensions = ['.svg', '.png', '.jpg', '.jpeg', '.webp', '.gif'];
+      const hasImageExtension = imageExtensions.some(ext => imagePath.toLowerCase().includes(ext));
+      
+      if (hasImageExtension) {
+        return API_BASE + '/api/image/' + imagePath;
+      }
+      
+      return imagePath;
+    }
+
+    // データ出力
+    async function exportData() {
+      try {
+        if (allShops.length === 0) {
+          // データがない場合は再取得
+          const response = await fetch(API_BASE + '/api/shops');
+          allShops = await response.json();
+        }
+        
+        const dataStr = JSON.stringify(allShops, null, 2);
+        const dataBlob = new Blob([dataStr], {type: 'application/json'});
+        
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'shops-data-' + new Date().toISOString().split('T')[0] + '.json';
+        link.click();
+        
+        URL.revokeObjectURL(url);
+        console.log('データエクスポート完了');
+        
+      } catch (error) {
+        console.error('データ出力エラー:', error);
+        alert('データ出力に失敗しました: ' + error.message);
+      }
+    }
+
+    console.log('管理画面スクリプト読み込み完了');
+  </script>
+</body>
+</html>

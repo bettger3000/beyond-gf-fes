@@ -1,0 +1,42 @@
+[
+  {
+    "id": "s01",
+    "name": "とまり來",
+    "category": ["スイーツ", "ドリンク"],
+    "tags": ["小麦不使用", "ナッツ不使用", "専用調理場"],
+    "short": "米粉ケーキとスペシャリティコーヒーの専門店",
+    "concept": "",
+    "desc": "からだにやさしい、こころにあたたかい。",
+    "targetCustomer": "",
+    "story": "",
+    "recommendation": "",
+    "allergyInfo": ["卵不使用", "乳不使用", "大豆不使用"],
+    "contamination": "専用施設での製造",
+    "menu": [{"name": "豆まっちゃチーズケーキ", "price": 650}],
+    "address": "〒470-1101 愛知県豊明市沓掛町田楽ヶ窪1-2-3",
+    "googleMaps": "https://maps.google.com/?q=豊明市沓掛町",
+    "links": {"instagram": "https://instagram.com/tomarigi_tyak"},
+    "thumb": "tomarigi.svg",
+    "photos": ["tomarigi_1.webp", "tomarigi_2.webp"]
+  },
+  {
+    "id": "s02",
+    "name": "DORA CAFE",
+    "category": ["カフェ"],
+    "tags": ["小麦不使用"],
+    "short": "グルテンフリーカフェ",
+    "concept": "",
+    "desc": "グルテンフリーメニュー豊富なカフェ",
+    "targetCustomer": "",
+    "story": "",
+    "recommendation": "",
+    "allergyInfo": [],
+    "contamination": "",
+    "menu": [],
+    "address": "",
+    "googleMaps": "",
+    "links": {},
+    "thumb": "doracafe.svg",
+    "photos": []
+  }
+]
