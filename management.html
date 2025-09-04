@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>店舗管理画面 - ビヨンドグルテンフリー祭り</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: #F5F3F0;
+      color: #2C2C2C;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #4A5D4F;
+      margin-bottom: 30px;
+      font-size: 2rem;
+    }
+
+    .nav {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .nav button {
+      background: #4A5D4F;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 0 5px;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    .nav button.active {
+      background: #D4634A;
+    }
+
+    .nav button:hover {
+      background: #B8985A;
+    }
+
+    .section {
+      display: none;
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .shop-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .shop-card {
+      background: #fff;
+      border: 2px solid #E8E0D6;
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .shop-card:hover {
+      border-color: #B8985A;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .shop-name {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #4A5D4F;
+      margin-bottom: 10px;
+    }
+
+    .shop-info {
+      color: #6B6B6B;
+      font-size: 0.9rem;
+      margin: 5px 0;
+    }
+
+    .shop-concept {
+      margin-top: 10px;
+      font-style: italic;
+      color: #2C2C2C;
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+
+    .shop-thumb {
+      width: 100%;
+      max-height: 150px;
+      object-fit: cover;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 50px;
+      font-size: 1.2rem;
+      color: #6B6B6B;
+    }
+
+    .error {
+      background: #fee;
+      color: #ef4444;
+      padding: 20px;
+      border-radius: 5px;
+      text-align: center;
+    }
+
+    .btn {
+      background: #4A5D4F;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    .btn:hover {
+      background: #B8985A;
+    }
+
+    .debug {
+      background: #f0f0f0;
+      padding: 10px;
+      margin-top: 20px;
+      border-radius: 5px;
+      font-family: monospace;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>店舗管理画面</h1>
+  
+  <div class="nav">
+    <button class="nav-btn active" onclick="showSection('list')">店舗一覧</button>
+    <button class="nav-btn" onclick="showSection('export')">データ出力</button>
+    <button class="nav-btn" onclick="showSection('debug')">デバッグ</button>
+  </div>
+
+  <div id="list" class="section active">
+    <h2>登録済み店舗一覧</h2>
+    <div id="shopsList" class="shop-list">
+      <div class="loading">店舗データを読み込み中...</div>
+    </div>
+  </div>
+
+  <div id="export" class="section">
+    <h2>データ出力</h2>
+    <p>店舗データをJSON形式でダウンロードします。</p>
+    <br>
+    <button class="btn" onclick="exportShopData()">JSONをダウンロード</button>
+  </div>
+
+  <div id="debug" class="section">
+    <h2>デバッグ情報</h2>
+    <div id="debugInfo" class="debug">
+      <p>APIエンドポイント: https://gf-fes-api.bettger1000.workers.dev/api/shops</p>
+      <p id="debugStatus">ステータス: 待機中</p>
+      <p id="debugCount">店舗数: -</p>
+      <p id="debugError">エラー: なし</p>
+    </div>
+    <br>
+    <button class="btn" onclick="testAPI()">API接続テスト</button>
+  </div>
+
+  <script>
+    // 初期化
+    let shopData = [];
+    const API_URL = 'https://gf-fes-api.bettger1000.workers.dev/api/shops';
+
+    // ページ読み込み完了時
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('[管理画面] 初期化開始');
+      fetchShops();
+    });
+
+    // セクション切り替え
+    function showSection(sectionId) {
+      // すべてのセクションを非表示
+      document.querySelectorAll('.section').forEach(s => {
+        s.classList.remove('active');
+      });
+      
+      // すべてのナビボタンを非アクティブ
+      document.querySelectorAll('.nav-btn').forEach(b => {
+        b.classList.remove('active');
+      });
+      
+      // 選択されたセクションを表示
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.classList.add('active');
+      }
+      
+      // 対応するボタンをアクティブに
+      event.target.classList.add('active');
+    }
+
+    // 店舗データ取得
+    async function fetchShops() {
+      const container = document.getElementById('shopsList');
+      updateDebug('ステータス', 'データ取得中...');
+      
+      try {
+        console.log('[API] 取得開始:', API_URL);
+        
+        const response = await fetch(API_URL);
+        console.log('[API] レスポンスステータス:', response.status);
+        
+        if (!response.ok) {
+          throw new Error('HTTPエラー: ' + response.status);
+        }
+        
+        const shops = await response.json();
+        console.log('[API] 取得成功! 店舗数:', shops.length);
+        
+        shopData = shops;
+        updateDebug('ステータス', '取得成功');
+        updateDebug('店舗数', shops.length);
+        
+        displayShops(shops);
+        
+      } catch (error) {
+        console.error('[API] エラー:', error);
+        updateDebug('ステータス', 'エラー');
+        updateDebug('エラー', error.message);
+        
+        container.innerHTML = `
+          <div class="error">
+            データの読み込みに失敗しました<br>
+            エラー: ${error.message}
+          </div>
+        `;
+      }
+    }
+
+    // 店舗一覧表示
+    function displayShops(shops) {
+      const container = document.getElementById('shopsList');
+      
+      if (!shops || shops.length === 0) {
+        container.innerHTML = '<div class="error">表示する店舗がありません</div>';
+        return;
+      }
+      
+      const html = shops.map(shop => {
+        const categories = Array.isArray(shop.category) ? shop.category.join(', ') : '未設定';
+        const thumb = shop.thumb ? getImageUrl(shop.thumb) : '';
+        
+        return `
+          <div class="shop-card">
+            <div class="shop-name">${shop.name || '名称未設定'}</div>
+            <div class="shop-info">📍 ${shop.address || '住所未設定'}</div>
+            <div class="shop-info">🏷️ ${categories}</div>
+            ${shop.concept ? `<div class="shop-concept">"${shop.concept}"</div>` : ''}
+            ${thumb ? `<img src="${thumb}" class="shop-thumb" alt="${shop.name}" onerror="this.style.display='none'">` : ''}
+          </div>
+        `;
+      }).join('');
+      
+      container.innerHTML = html;
+      console.log('[表示] 完了');
+    }
+
+    // 画像URLを取得
+    function getImageUrl(path) {
+      if (!path) return '';
+      if (path.startsWith('http')) return path;
+      
+      // 画像ファイルの拡張子チェック
+      if (path.match(/\.(svg|png|jpg|jpeg|webp|gif)$/i)) {
+        return 'https://gf-fes-api.bettger1000.workers.dev/api/image/' + path;
+      }
+      
+      return path;
+    }
+
+    // データエクスポート
+    function exportShopData() {
+      if (shopData.length === 0) {
+        alert('データがありません。先に店舗一覧を表示してください。');
+        return;
+      }
+      
+      const json = JSON.stringify(shopData, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'shops_' + new Date().toISOString().slice(0,10) + '.json';
+      a.click();
+      
+      URL.revokeObjectURL(url);
+      console.log('[エクスポート] 完了');
+    }
+
+    // API接続テスト
+    async function testAPI() {
+      updateDebug('ステータス', 'テスト中...');
+      
+      try {
+        const startTime = Date.now();
+        const response = await fetch(API_URL);
+        const responseTime = Date.now() - startTime;
+        
+        const data = await response.json();
+        
+        updateDebug('ステータス', '接続成功');
+        updateDebug('店舗数', data.length);
+        updateDebug('エラー', `なし (応答時間: ${responseTime}ms)`);
+        
+        alert(`API接続成功!\n店舗数: ${data.length}\n応答時間: ${responseTime}ms`);
+        
+      } catch (error) {
+        updateDebug('ステータス', '接続失敗');
+        updateDebug('エラー', error.message);
+        alert('API接続失敗: ' + error.message);
+      }
+    }
+
+    // デバッグ情報更新
+    function updateDebug(type, value) {
+      const mapping = {
+        'ステータス': 'debugStatus',
+        '店舗数': 'debugCount',
+        'エラー': 'debugError'
+      };
+      
+      const elementId = mapping[type];
+      if (elementId) {
+        const element = document.getElementById(elementId);
+        if (element) {
+          if (type === '店舗数') {
+            element.textContent = `店舗数: ${value}`;
+          } else if (type === 'ステータス') {
+            element.textContent = `ステータス: ${value}`;
+          } else if (type === 'エラー') {
+            element.textContent = `エラー: ${value}`;
+          }
+        }
+      }
+    }
+  </script>
+</body>
+</html>
