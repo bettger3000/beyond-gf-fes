@@ -26,20 +26,24 @@ fetch(apiUrl)
     
     document.getElementById('loading').style.display = 'none';
     
-    var html = '<h2>登録済み店舗一覧 (' + shops.length + '件)</h2>';
+    var html = '<h2 style="color:#2c5f2d;text-align:center;margin-bottom:30px;">✅ ' + shops.length + '件の店舗を管理中</h2>';
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:20px;">';
     
     shops.forEach(function(shop) {
-      html += '<div style="background:white;border:2px solid #E8E0D6;padding:20px;border-radius:8px;">';
-      html += '<h3 style="color:#4A5D4F;margin:0 0 10px 0;">' + shop.name + '</h3>';
-      html += '<p style="margin:5px 0;">📍 ' + (shop.address || '住所未設定') + '</p>';
+      html += '<div style="background:white;border:2px solid #2c5f2d;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">';
+      html += '<h3 style="color:#2c5f2d;margin:0 0 10px 0;">' + shop.name + '</h3>';
+      html += '<p style="margin:5px 0;color:#666;">📍 ' + (shop.address || '住所未設定') + '</p>';
       
       if (shop.category && shop.category.length > 0) {
-        html += '<p style="margin:5px 0;">🏷️ ' + shop.category.join(', ') + '</p>';
+        html += '<p style="margin:5px 0;color:#666;">🏷️ ' + shop.category.join(', ') + '</p>';
+      }
+      
+      if (shop.targetCustomer) {
+        html += '<p style="margin:5px 0;color:#666;">🎯 ' + shop.targetCustomer + '</p>';
       }
       
       if (shop.concept) {
-        html += '<div style="background:#F5F3F0;padding:10px;margin:10px 0;border-radius:5px;font-style:italic;">';
+        html += '<div style="background:#f0f8f0;padding:10px;margin:10px 0;border-radius:5px;font-style:italic;border-left:3px solid #2c5f2d;">';
         html += shop.concept;
         html += '</div>';
       }
