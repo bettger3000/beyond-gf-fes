@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>店舗管理 現在時刻: $(date)</title></head><body>
+<h1 style="text-align:center;color:#2c5f2d;">🍞 店舗管理システム</h1>
+<div id="status" style="text-align:center;font-size:18px;padding:20px;">読み込み中...</div>
+<div id="shops" style="max-width:1000px;margin:0 auto;"></div>
+
+<script>
+console.log('=== 店舗管理システム開始 ===');
+
+// ページ読み込み完了後に実行
+window.onload = function() {
+    console.log('ページ読み込み完了');
+    loadShopsData();
+};
+
+function loadShopsData() {
+    console.log('API呼び出し開始');
+    
+    fetch('https://gf-fes-api.bettger1000.workers.dev/api/shops')
+        .then(function(response) {
+            console.log('API応答ステータス:', response.status);
+            if (!response.ok) {
+                throw new Error('APIエラー: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(function(shops) {
+            console.log('✅ 店舗データ取得成功:', shops.length, '件');
+            
+            // ステータス更新
+            document.getElementById('status').innerHTML = '✅ ' + shops.length + '件の店舗データを表示中';
+            
+            // 店舗HTML生成
+            var html = '';
+            for (var i = 0; i < shops.length; i++) {
+                var shop = shops[i];
+                console.log('店舗' + (i+1) + ':', shop.name);
+                
+                html += '<div style="background:white;border:2px solid #ddd;margin:10px;padding:20px;border-radius:8px;">';
+                html += '<h3 style="color:#2c5f2d;margin:0 0 10px;">' + (shop.name || '未設定') + '</h3>';
+                html += '<div style="margin:5px 0;">📍 ' + (shop.address || '住所未設定') + '</div>';
+                
+                if (shop.category && Array.isArray(shop.category)) {
+                    html += '<div style="margin:5px 0;">🏷️ ' + shop.category.join(', ') + '</div>';
+                }
+                
+                if (shop.concept) {
+                    html += '<div style="background:#f0f8f0;padding:10px;margin:10px 0;border-radius:5px;font-style:italic;">"' + shop.concept + '"</div>';
+                }
+                
+                html += '</div>';
+            }
+            
+            document.getElementById('shops').innerHTML = html;
+            console.log('✅ 表示完了');
+        })
+        .catch(function(error) {
+            console.error('❌ エラー発生:', error);
+            document.getElementById('status').innerHTML = '❌ エラー: ' + error.message;
+        });
+}
+</script>
+
+<style>
+body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
+</style>
+
+</body></html>
