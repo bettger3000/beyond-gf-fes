@@ -1,0 +1,430 @@
+[
+  {
+    "id": "s01",
+    "name": "とまり來",
+    "category": [
+      "スイーツ",
+      "ドリンク"
+    ],
+    "tags": [
+      "小麦不使用",
+      "ナッツ不使用",
+      "専用調理場"
+    ],
+    "thumb": "assets/shops/tomarigi.svg",
+    "photos": [
+      "assets/shops/tomarigi_1.webp",
+      "assets/shops/tomarigi_2.webp"
+    ],
+    "short": "米粉ケーキとスペシャリティコーヒーの専門店",
+    "concept": "からだにやさしい、こころにあたたかい。",
+    "desc": "米粉はもちろん、抹茶、クーベルチュールチョコ、スペシャリティコーヒー豆等、一つ一つの素材にこだわったケーキをご提供。アナフィラキシーショックを経験した店主が、安心して食べられるケーキを作ります。",
+    "targetCustomer": "小麦アレルギーやグルテンフリーを必要とする方、からだにやさしいスイーツを求める方に安心して楽しんでいただきたいです。",
+    "story": "店主自身がアナフィラキシーショックを経験したことから、同じような方々が安心して食べられるケーキを作りたいという想いで始めました。一つ一つ丁寧に、愛情を込めて作っています。",
+    "allergyInfo": [
+      "卵不使用",
+      "乳不使用",
+      "大豆不使用"
+    ],
+    "contamination": "専用施設での製造",
+    "menu": [
+      {
+        "name": "豆まっちゃチーズケーキ",
+        "price": 650
+      },
+      {
+        "name": "おとうふショコラちゃん",
+        "price": 600
+      },
+      {
+        "name": "ふんわりシフォン",
+        "price": 550
+      },
+      {
+        "name": "スペシャリティコーヒー",
+        "price": 500
+      }
+    ],
+    "links": {
+      "instagram": "https://instagram.com/tomarigi_tyak"
+    },
+    "pickup": true,
+    "location": "豊明市沓掛町",
+    "address": "〒470-1101 愛知県豊明市沓掛町田楽ヶ窪1-2-3",
+    "googleMaps": "https://maps.google.com/?q=豊明市沓掛町"
+  },
+  {
+    "id": "s02",
+    "name": "どらカフェ三幸",
+    "location": "愛知県小牧市",
+    "address": "愛知県小牧市三ツ渕１６９２",
+    "googleMaps": "https://www.google.com/maps/place/%E3%81%A9%E3%82%89%E3%82%AB%E3%83%95%E3%82%A7%E4%B8%89%E5%B9%B8/data=!4m2!3m1!1s0x60030b0180439c0f:0xb2e732a9ea427dc?sa=X&ved=1t:242&ictx=111",
+    "category": [
+      "スイーツ"
+    ],
+    "tags": [
+      "小麦不使用",
+      "専用調理場"
+    ],
+    "thumb": "assets/shops/69EA9AFA-B3F9-458F-8A2C-C54783E2488F - ã®ã®ã®ãããã®ã³ããã¼_1200_1756955063456.jpeg",
+    "photos": [
+      "assets/shops/EMJ09833 - ã®ã®ã®ãããã®ã³ããã¼_1200_1756955068006.jpeg",
+      "assets/shops/EMJ09953 - ã®ã®ã®ãããã®ã³ããã¼_1200_1756955072217.jpeg",
+      "assets/shops/EMJ00235 - ã®ã®ã®ãããã®ã³ããã¼_1200_1756955075456.jpeg",
+      "assets/shops/IMG_9491 - ã®ã®ã®ãããã®ã³ããã¼_1200_1756955078492.jpeg"
+    ],
+    "short": "グルテンフリーのふわっもちっどらやき専門店",
+    "concept": "『福が来るどらやき』グルテンフリーだから美味しくないという想いを払拭したい。",
+    "desc": "ふわっもちっ食感の皮に自家製あんこをたっぷりはさんだどらやきを、ひとつひとつ丁寧に毎朝手作りしています。",
+    "targetCustomer": "グルテンフリーを必要とする方はもちろん、和菓子好きの方にも楽しんでいただきたいです。",
+    "story": "「グルテンフリーでも美味しいどらやきを作りたい」という想いから始まりました。試行錯誤を重ね、ふわっもちっとした食感を実現しました。",
+    "allergyInfo": [],
+    "contamination": "専用ラインでの製造",
+    "menu": [
+      {
+        "name": "どらやき（つぶあん）",
+        "price": 380
+      },
+      {
+        "name": "どらやき（抹茶）",
+        "price": 420
+      },
+      {
+        "name": "どらやき（季節限定）",
+        "price": 450
+      },
+      {
+        "name": "フィナンシェ",
+        "price": 350
+      }
+    ],
+    "links": {
+      "instagram": "https://instagram.com/doracafe_sanko"
+    },
+    "pickup": true
+  },
+  {
+    "id": "s03",
+    "name": "rucipio",
+    "category": [
+      "スイーツ"
+    ],
+    "tags": [
+      "小麦不使用",
+      "卵不使用",
+      "白砂糖不使用",
+      "乳製品一部使用"
+    ],
+    "thumb": "assets/shops/rucipio.svg",
+    "photos": [
+      "assets/shops/rucipio_1.webp",
+      "assets/shops/rucipio_2.webp"
+    ],
+    "short": "豆腐と米粉の優しいマフィン専門店",
+    "desc": "からだにも心にもやさしい、幸せなおやつ時間を届けたい。豆腐と米粉を主原料に、小麦・卵・白砂糖は不使用。ココロとカラダに優しい『幸せの処方箋』をお届けしています。",
+    "targetCustomer": "アレルギーをお持ちの方、自然素材を大切にする方、健康志向の方に安心してお召し上がりいただきたいです。",
+    "story": "「誰もが安心して食べられるお菓子を作りたい」という想いから生まれました。豆腐の優しさと米粉の美味しさを追求しています。",
+    "allergyInfo": [
+      "卵不使用",
+      "白砂糖不使用"
+    ],
+    "contamination": "同一施設内で製造",
+    "menu": [
+      {
+        "name": "豆腐米粉マフィン（プレーン）",
+        "price": 350
+      },
+      {
+        "name": "豆腐米粉マフィン（季節限定）",
+        "price": 380
+      },
+      {
+        "name": "豆腐米粉ガトーショコラ",
+        "price": 450
+      }
+    ],
+    "links": {
+      "instagram": "https://instagram.com/rucipio"
+    },
+    "location": "岐阜県恵那市"
+  },
+  {
+    "id": "s04",
+    "name": "くまさん家。のこめこぱん",
+    "category": [
+      "パン",
+      "スイーツ"
+    ],
+    "tags": [
+      "小麦不使用",
+      "乳不使用",
+      "砂糖不使用",
+      "美腸活"
+    ],
+    "thumb": "assets/shops/kumasan.svg",
+    "photos": [
+      "assets/shops/kumasan_1.webp",
+      "assets/shops/kumasan_2.webp"
+    ],
+    "short": "食べてキレイを叶える美腸活米粉パン",
+    "desc": "小麦・乳・砂糖不使用で焼く美腸活米粉パン。自家製あま酒や味醂などを使って焼いているので自然な甘みを感じられます。罪悪感なく美味しいパンを食べて欲しい、そんな想いを込めて作っています。",
+    "targetCustomer": "健康志向の方、美腸活に興味のある方、小麦や乳製品を控えたい方にお届けしたいです。",
+    "story": "自分自身の体調不良をきっかけに、添加物を使わない自然なパン作りを始めました。美腸活をテーマに、体に優しいパンを提供しています。",
+    "allergyInfo": [
+      "乳不使用",
+      "砂糖不使用"
+    ],
+    "contamination": "専用ラインでの製造",
+    "menu": [
+      {
+        "name": "おにぎりパン",
+        "price": 320
+      },
+      {
+        "name": "米粉食パン",
+        "price": 680
+      },
+      {
+        "name": "米粉焼き菓子セット",
+        "price": 500
+      }
+    ],
+    "links": {
+      "instagram": "https://instagram.com/kumano_hakkousyoku"
+    },
+    "pickup": true,
+    "location": "名古屋市南区"
+  },
+  {
+    "id": "s05",
+    "name": "2525sweets",
+    "category": [
+      "スイーツ"
+    ],
+    "tags": [
+      "8大アレルゲン不使用",
+      "専用調理場",
+      "豊富な種類"
+    ],
+    "thumb": "assets/shops/2525sweets.svg",
+    "photos": [
+      "assets/shops/2525sweets_1.webp",
+      "assets/shops/2525sweets_2.webp"
+    ],
+    "short": "みんなで一緒に楽しめる米粉フィナンシェ専門店",
+    "desc": "アレルギーのある人もない人も、みんな一緒に美味しく楽しいお菓子の時間を。小麦卵乳を持ち込まない専用キッチンで、10種類以上の豊富なフレーバーをご用意。選ぶ楽しさも味わってください！",
+    "targetCustomer": "8大アレルゲンを避けたい方、みんなで一緒におやつを楽しみたいファミリーに安心してお召し上がりいただきたいです。",
+    "story": "『みんな一緒に食べられるお菓子を』という想いから専用キッチンを設立。豊富なフレーバーで選ぶ楽しさもお届けしています。",
+    "allergyInfo": [
+      "8大アレルゲン不使用"
+    ],
+    "contamination": "専用施設での製造",
+    "menu": [
+      {
+        "name": "米粉フィナンシェ（プレーン）",
+        "price": 280
+      },
+      {
+        "name": "米粉フィナンシェ（宇治抹茶）",
+        "price": 320
+      },
+      {
+        "name": "米粉フィナンシェ（ピスタチオ）",
+        "price": 380
+      },
+      {
+        "name": "フィナンシェ5個セット",
+        "price": 1500
+      }
+    ],
+    "links": {
+      "instagram": "https://instagram.com/2525sweets"
+    },
+    "pickup": true,
+    "location": "愛知県名古屋市中区"
+  },
+  {
+    "id": "s06",
+    "name": "菜食食堂ととと",
+    "category": [
+      "食事"
+    ],
+    "tags": [
+      "小麦不使用",
+      "動物性不使用",
+      "八大アレルゲン不使用",
+      "有機野菜"
+    ],
+    "thumb": "assets/shops/tototo.svg",
+    "photos": [
+      "assets/shops/tototo_1.webp",
+      "assets/shops/tototo_2.webp"
+    ],
+    "short": "動物性不使用・有機野菜の大判お好み焼き",
+    "desc": "野菜だけでも『ちゃんと美味しい！』を届けたい。グルテンフリーの方にも気軽に屋外でお好み焼きを楽しんでほしくて、動物性不使用・有機野菜で作り上げる大判型のお好み焼きをご用意しました。",
+    "targetCustomer": "ヴィーガンの方、グルテンフリーが必要な方、有機野菜を大切にする方にお楽しみいただきたいです。",
+    "story": "『野菜だけでもちゃんと美味しい』を証明したくて始めました。屋外でも安心して食べられるグルテンフリーのお好み焼きを提供しています。",
+    "allergyInfo": [
+      "動物性不使用",
+      "八大アレルゲン不使用"
+    ],
+    "contamination": "専用調理器具使用",
+    "menu": [
+      {
+        "name": "大判お好み焼き",
+        "price": 980
+      },
+      {
+        "name": "ミニお好み焼き",
+        "price": 650
+      }
+    ],
+    "links": {
+      "instagram": "https://instagram.com/tototo.saishok"
+    },
+    "location": "露店営業"
+  },
+  {
+    "id": "s07",
+    "name": "米粉パンケーキ sora 1-na cafe",
+    "category": [
+      "スイーツ",
+      "ドリンク"
+    ],
+    "tags": [
+      "小麦不使用",
+      "専用調理場",
+      "キッチンカー"
+    ],
+    "thumb": "assets/shops/sora1na.svg",
+    "photos": [
+      "assets/shops/sora1na_1.webp",
+      "assets/shops/sora1na_2.webp"
+    ],
+    "short": "ふわふわ米粉パンケーキのキッチンカー",
+    "desc": "国産米粉100％使用、愛知県産『あいちのかおり』の米粉を使い、メレンゲでふっくらと焼き上げました。小麦アレルギーのある方も、そうでない方も、同じおやつを囲んで一緒に笑顔になってほしい。",
+    "targetCustomer": "小麦アレルギーの方、親子連れ、キッチンカーグルメを楽しみたい方に喜んでいただきたいです。",
+    "story": "『みんなで同じものを食べる喜びを』という想いでキッチンカーを始めました。愛知県産の米粉にこだわり、ふわふわ食感を追求しています。",
+    "allergyInfo": [
+      "小麦不使用"
+    ],
+    "contamination": "専用ラインでの製造",
+    "menu": [
+      {
+        "name": "米粉パンケーキ（プレーン）",
+        "price": 650
+      },
+      {
+        "name": "米粉パンケーキ（小倉）",
+        "price": 780
+      },
+      {
+        "name": "季節のパンケーキ",
+        "price": 850
+      },
+      {
+        "name": "ドリンクセット",
+        "price": 950
+      }
+    ],
+    "links": {
+      "instagram": "https://instagram.com/sora_1na_cafe"
+    },
+    "pickup": true,
+    "location": "名古屋市港区"
+  },
+  {
+    "id": "s08",
+    "name": "米粉のおやつ ココカラ日和",
+    "category": [
+      "スイーツ"
+    ],
+    "tags": [
+      "小麦不使用",
+      "卵不使用",
+      "無農薬米粉",
+      "オーガニック"
+    ],
+    "thumb": "assets/shops/cocokara.svg",
+    "photos": [
+      "assets/shops/cocokara_1.webp",
+      "assets/shops/cocokara_2.webp"
+    ],
+    "short": "無農薬米粉とオーガニック素材の焼き菓子",
+    "desc": "地元の田園風景を守ることにも繋がったらという思いも込めて。無農薬の米粉をメインに、オーガニックココナッツオイル・有機無調整豆乳などを使用した身体に優しい米粉のお菓子です。",
+    "targetCustomer": "オーガニック志向の方、無農薬にこだわる方、地産地消を大切にする方におすすめします。",
+    "story": "地元の田園風景を守りたいという想いと、安心できる食材で作りたいという気持ちから始まりました。無農薬米粉とオーガニック素材にこだわっています。",
+    "allergyInfo": [
+      "卵不使用",
+      "無農薬米粉"
+    ],
+    "contamination": "同一施設内で製造",
+    "menu": [
+      {
+        "name": "朝焼きマフィン",
+        "price": 380
+      },
+      {
+        "name": "米粉クッキー（5枚入）",
+        "price": 450
+      },
+      {
+        "name": "季節の焼き菓子",
+        "price": 420
+      }
+    ],
+    "links": {
+      "instagram": "https://instagram.com/cocokara_biyori"
+    },
+    "location": "愛知県知多郡阿久比町"
+  },
+  {
+    "id": "s09",
+    "name": "やさしいスイーツカフェ corpo",
+    "category": [
+      "パン",
+      "スイーツ"
+    ],
+    "tags": [
+      "小麦不使用",
+      "専用調理場",
+      "障がい者支援"
+    ],
+    "thumb": "assets/shops/corpo.svg",
+    "photos": [
+      "assets/shops/corpo_1.webp",
+      "assets/shops/corpo_2.webp"
+    ],
+    "short": "100%米粉パンとパティシエ自慢のケーキ",
+    "desc": "創業9周年。からだにやさしく、心もほっとするスイーツを届けたい。障害があっても自分らしく働ける場をつくりたい。食べる人も働く人も笑顔になれる、地域に根ざしたカフェとして歩み続けています。",
+    "targetCustomer": "グルテンフリーが必要な方、社会貢献を大切にする方、地域の皆様に愛され続けたいと思います。",
+    "story": "障がいのある方も自分らしく働ける場所を作りたいという想いで9年前に創業しました。美味しいスイーツで地域の笑顔を増やしていきたいです。",
+    "allergyInfo": [
+      "小麦不使用"
+    ],
+    "contamination": "専用ラインでの製造",
+    "menu": [
+      {
+        "name": "米粉パン（プレーン）",
+        "price": 280
+      },
+      {
+        "name": "米粉パン（季節限定）",
+        "price": 350
+      },
+      {
+        "name": "カットケーキ",
+        "price": 580
+      },
+      {
+        "name": "ホールタルト（要予約）",
+        "price": 3500
+      }
+    ],
+    "links": {
+      "instagram": "https://instagram.com/corpo_pr"
+    },
+    "pickup": true,
+    "location": "愛知県名古屋市中川区"
+  }
+]

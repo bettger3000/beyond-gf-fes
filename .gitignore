@@ -1,0 +1,8 @@
+node_modules/
+*.log
+.env
+.DS_Store
+shops-backup-*.json
+migrate.sql
+upload-images.sh
+migrate-data.js

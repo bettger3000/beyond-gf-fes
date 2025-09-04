@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>店舗データテスト</title>
+</head>
+<body>
+  <h1>店舗データテスト</h1>
+  <div id="shops-list"></div>
+  <div id="error-message"></div>
+
+  <script>
+    async function loadShops() {
+      try {
+        console.log('Fetching shops.json...');
+        const response = await fetch('shops.json');
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const shops = await response.json();
+        console.log('Loaded shops:', shops.length);
+        
+        const listElement = document.getElementById('shops-list');
+        listElement.innerHTML = shops.map(shop => 
+          `<div style="border: 1px solid #ccc; padding: 10px; margin: 10px;">
+            <h3>${shop.name}</h3>
+            <p>${shop.short}</p>
+            <p>カテゴリ: ${shop.category?.join(', ') || 'なし'}</p>
+          </div>`
+        ).join('');
+        
+      } catch (error) {
+        console.error('Error loading shops:', error);
+        document.getElementById('error-message').innerHTML = 
+          `<p style="color: red;">エラー: ${error.message}</p>`;
+      }
+    }
+
+    // ページ読み込み時に実行
+    document.addEventListener('DOMContentLoaded', loadShops);
+  </script>
+</body>
+</html>

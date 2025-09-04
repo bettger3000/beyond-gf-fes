@@ -1,0 +1,12 @@
+name = "gf-fes-api"
+main = "src/index.js"
+compatibility_date = "2023-12-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "beyond-gf-fes-db"
+database_id = "a5ad0b84-65aa-4f44-b60e-0d5e12e16a34"
+
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "gf-fes-images"

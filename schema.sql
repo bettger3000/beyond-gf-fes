@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS shops (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  category TEXT,
+  tags TEXT,
+  short TEXT,
+  concept TEXT,
+  desc TEXT,
+  targetCustomer TEXT,
+  story TEXT,
+  recommendation TEXT,
+  allergyInfo TEXT,
+  contamination TEXT,
+  menu TEXT,
+  address TEXT,
+  googleMaps TEXT,
+  links TEXT,
+  thumb TEXT,
+  photos TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);

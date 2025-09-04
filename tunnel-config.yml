@@ -1,0 +1,12 @@
+tunnel: 3e80701c-4d63-4b20-af68-0fd73d25929e
+credentials-file: /Users/kanakugimakoto/.cloudflared/3e80701c-4d63-4b20-af68-0fd73d25929e.json
+
+ingress:
+  # メインサイト
+  - hostname: gf-fes.com
+    service: http://localhost:4000
+  # www サブドメイン  
+  - hostname: www.gf-fes.com
+    service: http://localhost:4000
+  # 404 フォールバック
+  - service: http_status:404

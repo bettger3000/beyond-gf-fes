@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#F4EDE4"/>
+  <circle cx="200" cy="150" r="60" fill="#D4634A" opacity="0.3"/>
+  <text x="200" y="180" font-family="'Noto Sans JP', sans-serif" font-size="24" fill="#2C2C2C" text-anchor="middle" font-weight="600">とまり來</text>
+  <text x="200" y="220" font-family="'Noto Sans JP', sans-serif" font-size="14" fill="#6B6B6B" text-anchor="middle">米粉ケーキ</text>
+  <text x="200" y="240" font-family="'Noto Sans JP', sans-serif" font-size="14" fill="#6B6B6B" text-anchor="middle">スペシャリティコーヒー</text>
+  <rect x="50" y="280" width="300" height="2" fill="#B8985A" opacity="0.5"/>
+  <text x="200" y="320" font-family="'Noto Sans JP', sans-serif" font-size="12" fill="#4A5D4F" text-anchor="middle">豊明市沓掛町</text>
+</svg>
