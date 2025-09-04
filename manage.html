@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>店舗データ管理</title>
+</head>
+<body>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: sans-serif; background: #f5f5f5; padding: 20px; }
+h1 { text-align: center; color: #2c5f2d; margin-bottom: 30px; }
+.container { max-width: 1200px; margin: 0 auto; }
+.status { text-align: center; padding: 20px; font-size: 18px; }
+.shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+.shop { background: white; padding: 20px; border-radius: 8px; border: 2px solid #ddd; }
+.shop h3 { color: #2c5f2d; margin-bottom: 10px; }
+.shop p { margin: 8px 0; color: #666; }
+.concept { background: #f0f8f0; padding: 10px; margin-top: 10px; border-radius: 5px; font-style: italic; }
+</style>
+
+<div class="container">
+  <h1>🍞 店舗データ管理システム</h1>
+  <div id="status" class="status">データを読み込んでいます...</div>
+  <div id="content" class="shop-grid"></div>
+</div>
+
+<script>
+(function() {
+  console.log('新管理システム開始');
+  
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', 'https://gf-fes-api.bettger1000.workers.dev/api/shops', true);
+  
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        try {
+          var shops = JSON.parse(xhr.responseText);
+          console.log('店舗取得成功:', shops.length);
+          showShops(shops);
+        } catch (e) {
+          showError('データ解析エラー');
+        }
+      } else {
+        showError('通信エラー: ' + xhr.status);
+      }
+    }
+  };
+  
+  xhr.send();
+  
+  function showShops(shops) {
+    document.getElementById('status').innerHTML = '✅ ' + shops.length + '件の店舗を表示中';
+    
+    var html = '';
+    for (var i = 0; i < shops.length; i++) {
+      var shop = shops[i];
+      html += '<div class="shop">';
+      html += '<h3>' + shop.name + '</h3>';
+      html += '<p>📍 ' + (shop.address || '住所未設定') + '</p>';
+      
+      if (shop.category && shop.category.length > 0) {
+        html += '<p>🏷️ ' + shop.category.join(', ') + '</p>';
+      }
+      
+      if (shop.targetCustomer) {
+        html += '<p>🎯 ' + shop.targetCustomer + '</p>';
+      }
+      
+      if (shop.concept) {
+        html += '<div class="concept">' + shop.concept + '</div>';
+      }
+      
+      html += '</div>';
+    }
+    
+    document.getElementById('content').innerHTML = html;
+  }
+  
+  function showError(msg) {
+    document.getElementById('status').innerHTML = '❌ ' + msg;
+  }
+})();
+</script>
+
+</body>
+</html>
