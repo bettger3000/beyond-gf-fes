@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>店舗管理</title></head>
+<body>
+<h1>店舗管理画面</h1>
+<div id="loading">データ読み込み中...</div>
+<div id="shops"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('管理画面開始');
+    
+    // API呼び出し
+    fetch('https://gf-fes-api.bettger1000.workers.dev/api/shops')
+        .then(function(response) {
+            console.log('API応答:', response.status);
+            if (!response.ok) {
+                throw new Error('API エラー: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(function(shops) {
+            console.log('取得店舗数:', shops.length);
+            
+            // ローディング非表示
+            document.getElementById('loading').style.display = 'none';
+            
+            // 店舗表示
+            var html = '';
+            for (var i = 0; i < shops.length; i++) {
+                var shop = shops[i];
+                var categories = Array.isArray(shop.category) ? shop.category.join(', ') : '未設定';
+                
+                html += '<div style="background:white;border:2px solid #ddd;margin:15px;padding:20px;border-radius:8px;">';
+                html += '<h3 style="color:#2c5f2d;margin:0 0 10px 0;">' + (shop.name || '名称未設定') + '</h3>';
+                html += '<p style="margin:5px 0;">📍 住所: ' + (shop.address || '未設定') + '</p>';
+                html += '<p style="margin:5px 0;">🏷️ カテゴリ: ' + categories + '</p>';
+                
+                if (shop.concept) {
+                    html += '<p style="background:#f0f8f0;padding:10px;margin:10px 0;border-radius:5px;font-style:italic;">' + shop.concept + '</p>';
+                }
+                
+                html += '</div>';
+            }
+            
+            document.getElementById('shops').innerHTML = html;
+            console.log('表示完了');
+        })
+        .catch(function(error) {
+            console.error('エラー:', error);
+            document.getElementById('loading').innerHTML = '❌ エラー: ' + error.message;
+        });
+});
+</script>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #2c5f2d;
+    margin-bottom: 30px;
+}
+
+#loading {
+    text-align: center;
+    font-size: 18px;
+    color: #666;
+    padding: 50px 0;
+}
+
+#shops {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+</style>
+
+</body>
+</html>
