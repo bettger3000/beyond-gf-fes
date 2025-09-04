@@ -670,6 +670,64 @@
     </section>
   </div>
 
-  <script src="admin.js"></script>
+  <script>
+    // 画像アップロード処理を直接埋め込み（キャッシュ回避）
+    async function handleImageUpload(input, type, index = null) {
+      const file = input.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        alert('画像ファイルを選択してください。');
+        input.value = '';
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        alert('ファイルサイズは5MB以下にしてください。');
+        input.value = '';
+        return;
+      }
+
+      try {
+        const progressDiv = document.createElement('div');
+        progressDiv.textContent = 'アップロード中...';
+        progressDiv.style.color = '#007bff';
+        progressDiv.style.fontSize = '12px';
+        progressDiv.style.marginTop = '5px';
+        input.parentElement.appendChild(progressDiv);
+
+        // R2バケットへの自動アップロード
+        const formData = new FormData();
+        formData.append('image', file);
+
+        const response = await fetch('https://gf-fes-api.bettger1000.workers.dev/api/upload-image', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error('画像のアップロードに失敗しました');
+        }
+
+        const result = await response.json();
+        const imageUrl = result.imagePath;
+        
+        // 成功メッセージ
+        progressDiv.remove();
+        const successDiv = document.createElement('div');
+        successDiv.innerHTML = `<p style="color: #28a745; font-size: 12px; margin-top: 5px;">✅ 画像のアップロードが完了しました！</p>`;
+        input.parentElement.appendChild(successDiv);
+        setTimeout(() => successDiv.remove(), 3000);
+        
+        console.log('アップロード成功:', imageUrl);
+        
+      } catch (error) {
+        console.error('画像アップロードエラー:', error);
+        alert('画像のアップロードに失敗しました: ' + error.message);
+        input.value = '';
+      }
+    }
+  </script>
+  <script src="admin.js?v=2025090412"></script>
 </body>
 </html>
