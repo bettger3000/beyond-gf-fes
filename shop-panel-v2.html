@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>店舗管理システム</title>
+</head>
+<body>
+  <h1>🍞 店舗管理システム v2</h1>
+  <div id="status">読み込み中...</div>
+  <div id="data"></div>
+  
+  <script>
+    console.log('システム開始');
+    
+    fetch('https://gf-fes-api.bettger1000.workers.dev/api/shops')
+      .then(res => {
+        console.log('レスポンス:', res.status);
+        return res.json();
+      })
+      .then(shops => {
+        console.log('店舗データ:', shops.length, '件');
+        
+        document.getElementById('status').innerHTML = `✅ ${shops.length}件の店舗データを取得`;
+        
+        const html = shops.map(shop => 
+          `<div style="border:1px solid #ccc; margin:10px; padding:15px; background:#f9f9f9;">
+             <h3 style="color:#2c5f2d;">${shop.name}</h3>
+             <p>📍 ${shop.address || '住所未設定'}</p>
+             <p>🏷️ ${Array.isArray(shop.category) ? shop.category.join(', ') : '未分類'}</p>
+             ${shop.concept ? `<p style="font-style:italic; background:#e8f5e8; padding:8px;">"${shop.concept}"</p>` : ''}
+           </div>`
+        ).join('');
+        
+        document.getElementById('data').innerHTML = html;
+      })
+      .catch(err => {
+        console.error('エラー:', err);
+        document.getElementById('status').innerHTML = '❌ エラー: ' + err.message;
+      });
+  </script>
+  
+  <style>
+    body { font-family: Arial; padding: 20px; background: #f5f5f5; }
+    h1 { text-align: center; color: #2c5f2d; }
+    #status { text-align: center; font-size: 18px; margin: 20px 0; }
+    #data { max-width: 1000px; margin: 0 auto; }
+  </style>
+</body>
+</html>
