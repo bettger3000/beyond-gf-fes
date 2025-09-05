@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍞 最終管理画面 - 店舗データ表示</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Hiragino Sans', 'Yu Gothic', Arial, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 20px;
+}
+.main-container {
+  max-width: 1600px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+.header-section {
+  background: linear-gradient(135deg, #2c5f2d 0%, #4a7c59 100%);
+  color: white;
+  padding: 40px;
+  text-align: center;
+}
+.main-title {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+.sub-title {
+  font-size: 18px;
+  opacity: 0.9;
+}
+.status-area {
+  padding: 40px;
+  text-align: center;
+  border-bottom: 3px solid #f0f0f0;
+}
+.loading-status {
+  background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+  color: #856404;
+  padding: 25px;
+  border-radius: 15px;
+  font-size: 20px;
+  font-weight: bold;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+.success-status {
+  background: linear-gradient(135deg, #d4edda, #a8e6cf);
+  color: #155724;
+  padding: 25px;
+  border-radius: 15px;
+  font-size: 22px;
+  font-weight: bold;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+.error-status {
+  background: linear-gradient(135deg, #f8d7da, #ff7675);
+  color: #721c24;
+  padding: 25px;
+  border-radius: 15px;
+  font-size: 20px;
+  font-weight: bold;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+.shops-display {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+  gap: 30px;
+  padding: 40px;
+}
+.shop-box {
+  background: linear-gradient(135deg, #ffffff, #f8f9fa);
+  border: 3px solid #2c5f2d;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 10px 25px rgba(44, 95, 45, 0.15);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.shop-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, #2c5f2d, #4a7c59, #2c5f2d);
+}
+.shop-box:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 35px rgba(44, 95, 45, 0.25);
+}
+.shop-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 3px solid #f0f0f0;
+}
+.shop-title {
+  font-size: 26px;
+  font-weight: bold;
+  color: #2c5f2d;
+  margin: 0;
+}
+.shop-badge {
+  background: linear-gradient(135deg, #2c5f2d, #4a7c59);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0 3px 10px rgba(44, 95, 45, 0.3);
+}
+.detail-line {
+  display: flex;
+  align-items: flex-start;
+  margin: 15px 0;
+  font-size: 16px;
+}
+.detail-emoji {
+  margin-right: 15px;
+  font-size: 22px;
+  min-width: 35px;
+  flex-shrink: 0;
+}
+.detail-content {
+  color: #444;
+  line-height: 1.6;
+  flex: 1;
+}
+.category-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 18px 0;
+}
+.category-item {
+  background: linear-gradient(135deg, #74b9ff, #0984e3);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 3px 10px rgba(116, 185, 255, 0.3);
+}
+.concept-area {
+  background: linear-gradient(135deg, #e8f5e8, #d1f2d1);
+  padding: 25px;
+  border-radius: 15px;
+  margin: 25px 0;
+  border-left: 5px solid #2c5f2d;
+  font-style: italic;
+  color: #2c5f2d;
+  line-height: 1.7;
+  font-size: 16px;
+  box-shadow: 0 3px 10px rgba(44, 95, 45, 0.1);
+}
+.menu-area {
+  margin-top: 25px;
+  padding-top: 25px;
+  border-top: 3px solid #f0f0f0;
+}
+.menu-header {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2c5f2d;
+  margin-bottom: 15px;
+}
+.menu-entry {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  padding: 12px 18px;
+  margin: 10px 0;
+  border-radius: 10px;
+  font-size: 15px;
+  color: #495057;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.load-spinner {
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #2c5f2d;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: rotate 1s linear infinite;
+  display: inline-block;
+  margin-right: 20px;
+}
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@media (max-width: 768px) {
+  .shops-display { grid-template-columns: 1fr; }
+  .main-title { font-size: 28px; }
+}
+</style>
+</head>
+<body>
+
+<div class="main-container">
+  <div class="header-section">
+    <h1 class="main-title">🍞 店舗管理システム【最終版】</h1>
+    <p class="sub-title">ビヨンドグルテンフリー祭り 2025 - 完全データ表示</p>
+  </div>
+  
+  <div class="status-area">
+    <div id="current-status" class="loading-status">
+      <span class="load-spinner"></span>
+      店舗データを確実に読み込んでいます...
+    </div>
+  </div>
+  
+  <div id="all-shops" class="shops-display"></div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+  
+  console.log('🍞 最終管理システム起動開始');
+  console.log('タイムスタンプ:', new Date().toISOString());
+  
+  const statusDiv = document.getElementById('current-status');
+  const shopsDiv = document.getElementById('all-shops');
+  const SHOPS_API = 'https://gf-fes-api.bettger1000.workers.dev/api/shops';
+  
+  console.log('使用API:', SHOPS_API);
+  
+  // データ取得実行
+  fetchAllShops();
+  
+  function fetchAllShops() {
+    console.log('=== データ取得開始 ===');
+    
+    const request = new XMLHttpRequest();
+    request.open('GET', SHOPS_API, true);
+    request.timeout = 15000;
+    
+    request.onreadystatechange = function() {
+      if (request.readyState === 4) {
+        console.log('リクエスト完了 - ステータス:', request.status);
+        
+        if (request.status === 200) {
+          try {
+            const allShops = JSON.parse(request.responseText);
+            console.log('✅ データ取得成功');
+            console.log('店舗件数:', allShops.length);
+            console.log('店舗データ:', allShops);
+            showAllShops(allShops);
+          } catch (parseError) {
+            console.error('❌ JSON解析失敗:', parseError);
+            showErrorMessage('データ解析に失敗しました: ' + parseError.message);
+          }
+        } else {
+          console.error('❌ HTTP エラー:', request.status);
+          showErrorMessage('HTTP エラー: ' + request.status);
+        }
+      }
+    };
+    
+    request.onerror = function() {
+      console.error('❌ ネットワークエラー発生');
+      showErrorMessage('ネットワーク接続に失敗しました');
+    };
+    
+    request.ontimeout = function() {
+      console.error('❌ リクエストタイムアウト');
+      showErrorMessage('サーバー応答がタイムアウトしました');
+    };
+    
+    console.log('XMLHttpRequest 送信中...');
+    request.send();
+  }
+  
+  function showAllShops(shops) {
+    if (!shops || !Array.isArray(shops) || shops.length === 0) {
+      showErrorMessage('店舗データが存在しません');
+      return;
+    }
+    
+    console.log('店舗表示処理開始 - 件数:', shops.length);
+    
+    statusDiv.className = 'success-status';
+    statusDiv.innerHTML = '✅ ' + shops.length + '件の店舗データを完全表示中';
+    
+    let allHtml = '';
+    
+    shops.forEach(function(shop, index) {
+      console.log('処理中の店舗:', (index + 1), shop.name);
+      allHtml += buildShopCard(shop, index + 1);
+    });
+    
+    shopsDiv.innerHTML = allHtml;
+    console.log('🎉 全店舗表示完了');
+  }
+  
+  function buildShopCard(shop, number) {
+    let card = '<div class="shop-box">';
+    
+    // ヘッダー部分
+    card += '<div class="shop-top">';
+    card += '<h2 class="shop-title">' + escapeHtml(shop.name || '店舗' + number) + '</h2>';
+    card += '<span class="shop-badge">' + escapeHtml(shop.id || 'ID' + number) + '</span>';
+    card += '</div>';
+    
+    // 住所
+    if (shop.address) {
+      card += '<div class="detail-line">';
+      card += '<span class="detail-emoji">📍</span>';
+      card += '<span class="detail-content"><strong>住所:</strong> ' + escapeHtml(shop.address) + '</span>';
+      card += '</div>';
+    }
+    
+    // カテゴリ
+    if (shop.category && Array.isArray(shop.category) && shop.category.length > 0) {
+      card += '<div class="detail-line">';
+      card += '<span class="detail-emoji">🏷️</span>';
+      card += '<div class="category-list">';
+      shop.category.forEach(function(cat) {
+        card += '<span class="category-item">' + escapeHtml(cat) + '</span>';
+      });
+      card += '</div>';
+      card += '</div>';
+    }
+    
+    // ターゲット顧客
+    if (shop.targetCustomer) {
+      card += '<div class="detail-line">';
+      card += '<span class="detail-emoji">🎯</span>';
+      card += '<span class="detail-content"><strong>対象顧客:</strong> ' + escapeHtml(shop.targetCustomer) + '</span>';
+      card += '</div>';
+    }
+    
+    // 簡潔説明
+    if (shop.short) {
+      card += '<div class="detail-line">';
+      card += '<span class="detail-emoji">💫</span>';
+      card += '<span class="detail-content"><strong>特徴:</strong> ' + escapeHtml(shop.short) + '</span>';
+      card += '</div>';
+    }
+    
+    // コンセプト
+    if (shop.concept) {
+      card += '<div class="concept-area">';
+      card += '<strong>🎨 コンセプト:</strong><br>' + escapeHtml(shop.concept);
+      card += '</div>';
+    }
+    
+    // メニュー
+    if (shop.menu && Array.isArray(shop.menu) && shop.menu.length > 0) {
+      card += '<div class="menu-area">';
+      card += '<div class="menu-header">📋 提供メニュー</div>';
+      shop.menu.forEach(function(item) {
+        card += '<div class="menu-entry">';
+        card += escapeHtml(item.name || '商品');
+        if (item.price) {
+          card += ' - <strong>' + escapeHtml(item.price) + '</strong>';
+        }
+        card += '</div>';
+      });
+      card += '</div>';
+    }
+    
+    card += '</div>';
+    return card;
+  }
+  
+  function showErrorMessage(message) {
+    statusDiv.className = 'error-status';
+    statusDiv.innerHTML = '❌ ' + escapeHtml(message);
+    shopsDiv.innerHTML = '';
+  }
+  
+  function escapeHtml(unsafe) {
+    if (typeof unsafe !== 'string') return '';
+    return unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+  
+})();
+</script>
+
+</body>
+</html>
