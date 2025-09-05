@@ -1,0 +1,284 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>🍞 店舗管理システム【完全版】</title></head><body style="margin:0;padding:0;font-family:'Hiragino Sans','Yu Gothic',Arial,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:20px;">
+
+<div style="max-width:1600px;margin:0 auto;background:white;border-radius:20px;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,0.3);">
+
+<div style="background:linear-gradient(135deg,#2c5f2d 0%,#4a7c59 100%);color:white;padding:40px;text-align:center;">
+<h1 style="font-size:36px;font-weight:bold;margin:0 0 10px 0;">🍞 店舗管理システム【完全版】</h1>
+<p style="font-size:18px;opacity:0.9;margin:0;">ビヨンドグルテンフリー祭り 2025 - 登録・編集・削除</p>
+</div>
+
+<div style="padding:20px;border-bottom:2px solid #eee;">
+<div style="display:flex;justify-content:center;gap:15px;flex-wrap:wrap;">
+<button onclick="showSection('list')" id="btn-list" style="background:#2c5f2d;color:white;border:none;padding:12px 24px;border-radius:25px;font-size:16px;cursor:pointer;font-weight:bold;">📋 店舗一覧</button>
+<button onclick="showSection('add')" id="btn-add" style="background:#4a90e2;color:white;border:none;padding:12px 24px;border-radius:25px;font-size:16px;cursor:pointer;font-weight:bold;">🆕 新規登録</button>
+<button onclick="exportData()" style="background:#e74c3c;color:white;border:none;padding:12px 24px;border-radius:25px;font-size:16px;cursor:pointer;font-weight:bold;">💾 データ出力</button>
+</div>
+</div>
+
+<div id="section-list" style="display:block;">
+<div style="padding:30px;text-align:center;">
+<div id="status" style="background:linear-gradient(135deg,#ffecd2 0%,#fcb69f 100%);color:#d2691e;padding:20px;border-radius:15px;font-size:18px;font-weight:bold;margin-bottom:30px;">
+<span style="display:inline-block;width:25px;height:25px;border:3px solid #f3f3f3;border-top:3px solid #2c5f2d;border-radius:50%;animation:spin 1s linear infinite;margin-right:10px;"></span>
+店舗データを読み込んでいます...
+</div>
+</div>
+<div id="shops-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:25px;padding:0 30px 30px;"></div>
+</div>
+
+<div id="section-add" style="display:none;padding:40px;">
+<h2 style="color:#2c5f2d;text-align:center;margin-bottom:30px;font-size:28px;">🆕 新規店舗登録</h2>
+<form id="shop-form" style="max-width:800px;margin:0 auto;">
+<div style="display:grid;gap:20px;">
+
+<div>
+<label style="display:block;font-weight:bold;margin-bottom:8px;color:#333;">店舗名 *</label>
+<input type="text" id="shop-name" required style="width:100%;padding:12px;border:2px solid #ddd;border-radius:8px;font-size:16px;">
+</div>
+
+<div>
+<label style="display:block;font-weight:bold;margin-bottom:8px;color:#333;">住所</label>
+<input type="text" id="shop-address" style="width:100%;padding:12px;border:2px solid #ddd;border-radius:8px;font-size:16px;">
+</div>
+
+<div>
+<label style="display:block;font-weight:bold;margin-bottom:8px;color:#333;">カテゴリ（複数選択可）</label>
+<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;">
+<label style="display:flex;align-items:center;"><input type="checkbox" value="スイーツ" style="margin-right:5px;"> スイーツ</label>
+<label style="display:flex;align-items:center;"><input type="checkbox" value="食事" style="margin-right:5px;"> 食事</label>
+<label style="display:flex;align-items:center;"><input type="checkbox" value="パン" style="margin-right:5px;"> パン</label>
+<label style="display:flex;align-items:center;"><input type="checkbox" value="ドリンク" style="margin-right:5px;"> ドリンク</label>
+<label style="display:flex;align-items:center;"><input type="checkbox" value="調味料" style="margin-right:5px;"> 調味料</label>
+<label style="display:flex;align-items:center;"><input type="checkbox" value="グッズ" style="margin-right:5px;"> グッズ</label>
+</div>
+</div>
+
+<div>
+<label style="display:block;font-weight:bold;margin-bottom:8px;color:#333;">特徴・タグ（複数選択可）</label>
+<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;">
+<label style="display:flex;align-items:center;"><input type="checkbox" value="小麦不使用" style="margin-right:5px;"> 小麦不使用</label>
+<label style="display:flex;align-items:center;"><input type="checkbox" value="卵不使用" style="margin-right:5px;"> 卵不使用</label>
+<label style="display:flex;align-items:center;"><input type="checkbox" value="乳不使用" style="margin-right:5px;"> 乳不使用</label>
+<label style="display:flex;align-items:center;"><input type="checkbox" value="ナッツ不使用" style="margin-right:5px;"> ナッツ不使用</label>
+<label style="display:flex;align-items:center;"><input type="checkbox" value="有機" style="margin-right:5px;"> 有機</label>
+<label style="display:flex;align-items:center;"><input type="checkbox" value="ヴィーガン対応" style="margin-right:5px;"> ヴィーガン対応</label>
+</div>
+</div>
+
+<div>
+<label style="display:block;font-weight:bold;margin-bottom:8px;color:#333;">簡潔な説明</label>
+<input type="text" id="shop-short" style="width:100%;padding:12px;border:2px solid #ddd;border-radius:8px;font-size:16px;" placeholder="例: 米粉ケーキとスペシャリティコーヒーの専門店">
+</div>
+
+<div>
+<label style="display:block;font-weight:bold;margin-bottom:8px;color:#333;">コンセプト</label>
+<textarea id="shop-concept" rows="4" style="width:100%;padding:12px;border:2px solid #ddd;border-radius:8px;font-size:16px;resize:vertical;" placeholder="店舗のコンセプトや想いを入力"></textarea>
+</div>
+
+<div>
+<label style="display:block;font-weight:bold;margin-bottom:8px;color:#333;">対象顧客</label>
+<textarea id="shop-target" rows="3" style="width:100%;padding:12px;border:2px solid #ddd;border-radius:8px;font-size:16px;resize:vertical;" placeholder="どのような顧客をターゲットにしているか"></textarea>
+</div>
+
+<div>
+<label style="display:block;font-weight:bold;margin-bottom:8px;color:#333;">Instagram URL</label>
+<input type="url" id="shop-instagram" style="width:100%;padding:12px;border:2px solid #ddd;border-radius:8px;font-size:16px;" placeholder="https://instagram.com/your-account">
+</div>
+
+<div style="text-align:center;margin-top:30px;">
+<button type="submit" style="background:linear-gradient(135deg,#2c5f2d,#4a7c59);color:white;border:none;padding:15px 40px;border-radius:25px;font-size:18px;font-weight:bold;cursor:pointer;">💾 店舗を登録</button>
+<button type="button" onclick="resetForm()" style="background:#6c757d;color:white;border:none;padding:15px 40px;border-radius:25px;font-size:18px;font-weight:bold;cursor:pointer;margin-left:15px;">🔄 リセット</button>
+</div>
+
+</div>
+</form>
+</div>
+
+</div>
+
+<style>
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+</style>
+
+<script>
+var API_BASE = 'https://gf-fes-api.bettger1000.workers.dev/api';
+var shops = [];
+
+console.log('🚀 完全管理システム起動');
+loadShops();
+
+function showSection(section) {
+  document.getElementById('section-list').style.display = section === 'list' ? 'block' : 'none';
+  document.getElementById('section-add').style.display = section === 'add' ? 'block' : 'none';
+  
+  document.getElementById('btn-list').style.background = section === 'list' ? '#2c5f2d' : '#6c757d';
+  document.getElementById('btn-add').style.background = section === 'add' ? '#4a90e2' : '#6c757d';
+  
+  if (section === 'list') loadShops();
+}
+
+function loadShops() {
+  console.log('📡 店舗一覧取得開始');
+  var statusDiv = document.getElementById('status');
+  
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', API_BASE + '/shops', true);
+  xhr.timeout = 20000;
+  
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      try {
+        shops = JSON.parse(xhr.responseText);
+        console.log('✅ 店舗取得成功:', shops.length + '件');
+        displayShops();
+      } catch (e) {
+        console.error('❌ JSON解析エラー:', e);
+        statusDiv.innerHTML = '❌ データ解析エラー';
+      }
+    } else {
+      console.error('❌ HTTP エラー:', xhr.status);
+      statusDiv.innerHTML = '❌ サーバーエラー: ' + xhr.status;
+    }
+  };
+  
+  xhr.onerror = function() {
+    console.error('❌ 通信エラー');
+    statusDiv.innerHTML = '❌ 通信エラー';
+  };
+  
+  xhr.send();
+}
+
+function displayShops() {
+  var statusDiv = document.getElementById('status');
+  var listDiv = document.getElementById('shops-list');
+  
+  if (!shops || shops.length === 0) {
+    statusDiv.innerHTML = '⚠️ 登録済み店舗がありません';
+    listDiv.innerHTML = '';
+    return;
+  }
+  
+  statusDiv.innerHTML = '✅ ' + shops.length + '件の店舗を管理中';
+  
+  var html = '';
+  for (var i = 0; i < shops.length; i++) {
+    var shop = shops[i];
+    html += '<div style="background:white;border:2px solid #2c5f2d;border-radius:15px;padding:25px;box-shadow:0 8px 20px rgba(44,95,45,0.15);">';
+    html += '<h3 style="color:#2c5f2d;margin:0 0 15px 0;">' + (shop.name || '名前未設定') + '</h3>';
+    if (shop.address) html += '<div style="margin:10px 0;">📍 ' + shop.address + '</div>';
+    if (shop.short) html += '<div style="margin:10px 0;">⭐ ' + shop.short + '</div>';
+    html += '<div style="margin-top:15px;">';
+    html += '<button onclick="alert(\'編集機能は実装中です\')" style="background:#4a90e2;color:white;border:none;padding:8px 16px;border-radius:20px;margin-right:10px;cursor:pointer;">✏️ 編集</button>';
+    html += '<button onclick="deleteShop(\'' + shop.id + '\')" style="background:#e74c3c;color:white;border:none;padding:8px 16px;border-radius:20px;cursor:pointer;">🗑️ 削除</button>';
+    html += '</div>';
+    html += '</div>';
+  }
+  
+  listDiv.innerHTML = html;
+  console.log('🎉 店舗一覧表示完了');
+}
+
+function deleteShop(id) {
+  if (!confirm('本当に削除しますか？')) return;
+  
+  var xhr = new XMLHttpRequest();
+  xhr.open('DELETE', API_BASE + '/shops/' + id, true);
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      alert('削除しました');
+      loadShops();
+    } else {
+      alert('削除に失敗しました');
+    }
+  };
+  xhr.send();
+}
+
+document.getElementById('shop-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  var name = document.getElementById('shop-name').value.trim();
+  if (!name) {
+    alert('店舗名を入力してください');
+    return;
+  }
+  
+  var categories = [];
+  var tags = [];
+  var checks = document.querySelectorAll('input[type="checkbox"]:checked');
+  for (var i = 0; i < checks.length; i++) {
+    if (['スイーツ','食事','パン','ドリンク','調味料','グッズ'].indexOf(checks[i].value) !== -1) {
+      categories.push(checks[i].value);
+    } else {
+      tags.push(checks[i].value);
+    }
+  }
+  
+  var shopData = {
+    id: 's' + Date.now(),
+    name: name,
+    address: document.getElementById('shop-address').value.trim(),
+    category: categories,
+    tags: tags,
+    short: document.getElementById('shop-short').value.trim(),
+    concept: document.getElementById('shop-concept').value.trim(),
+    targetCustomer: document.getElementById('shop-target').value.trim(),
+    links: {
+      instagram: document.getElementById('shop-instagram').value.trim()
+    }
+  };
+  
+  console.log('💾 店舗保存開始:', shopData);
+  
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', API_BASE + '/shops', true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.timeout = 30000;
+  
+  xhr.onload = function() {
+    if (xhr.status === 200 || xhr.status === 201) {
+      console.log('✅ 店舗保存成功');
+      alert('✅ 店舗を登録しました！');
+      resetForm();
+      showSection('list');
+    } else {
+      console.error('❌ 保存エラー:', xhr.status);
+      alert('❌ 保存に失敗しました: ' + xhr.status);
+    }
+  };
+  
+  xhr.onerror = function() {
+    console.error('❌ 通信エラー');
+    alert('❌ 通信エラーが発生しました');
+  };
+  
+  xhr.send(JSON.stringify(shopData));
+});
+
+function resetForm() {
+  document.getElementById('shop-form').reset();
+}
+
+function exportData() {
+  if (!shops || shops.length === 0) {
+    alert('エクスポートするデータがありません');
+    return;
+  }
+  
+  var jsonStr = JSON.stringify(shops, null, 2);
+  var blob = new Blob([jsonStr], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'shops-' + new Date().toISOString().slice(0,19).replace(/:/g,'-') + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  console.log('💾 データエクスポート完了');
+}
+</script>
+
+</body></html>
