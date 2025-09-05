@@ -2,73 +2,335 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>店舗管理画面</title>
+<title>🍞 店舗管理システム - ビヨンドグルテンフリー祭り</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+  background: #2c5f2d;
+  color: white;
+  min-height: 100vh;
+}
+.admin-container {
+  background: white;
+  color: #333;
+  margin: 20px auto;
+  max-width: 1400px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+.admin-header {
+  background: #2c5f2d;
+  color: white;
+  padding: 30px;
+  text-align: center;
+}
+.admin-title {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+.admin-subtitle {
+  font-size: 16px;
+  opacity: 0.9;
+}
+.status-section {
+  padding: 30px;
+  text-align: center;
+  border-bottom: 2px solid #eee;
+}
+.status-loading {
+  background: #fff3cd;
+  color: #856404;
+  padding: 20px;
+  border-radius: 8px;
+  font-size: 18px;
+}
+.status-success {
+  background: #d4edda;
+  color: #155724;
+  padding: 20px;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: bold;
+}
+.status-error {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 20px;
+  border-radius: 8px;
+  font-size: 18px;
+}
+.shops-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+  gap: 25px;
+  padding: 30px;
+}
+.shop-card {
+  background: white;
+  border: 2px solid #2c5f2d;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 5px 15px rgba(44, 95, 45, 0.1);
+  transition: transform 0.3s ease;
+}
+.shop-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(44, 95, 45, 0.2);
+}
+.shop-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
+}
+.shop-name {
+  font-size: 24px;
+  font-weight: bold;
+  color: #2c5f2d;
+  margin: 0;
+}
+.shop-id {
+  background: #2c5f2d;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+}
+.info-row {
+  display: flex;
+  align-items: flex-start;
+  margin: 12px 0;
+  font-size: 16px;
+}
+.info-icon {
+  margin-right: 12px;
+  font-size: 20px;
+  min-width: 30px;
+}
+.info-text {
+  color: #555;
+  line-height: 1.5;
+}
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 15px 0;
+}
+.tag {
+  background: #4a90e2;
+  color: white;
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.concept-box {
+  background: linear-gradient(135deg, #e8f5e8, #f0f8f0);
+  padding: 20px;
+  border-radius: 10px;
+  margin: 20px 0;
+  border-left: 4px solid #2c5f2d;
+  font-style: italic;
+  color: #2c5f2d;
+  line-height: 1.6;
+}
+.menu-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 2px solid #f0f0f0;
+}
+.menu-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #2c5f2d;
+  margin-bottom: 10px;
+}
+.menu-item {
+  background: #f8f9fa;
+  padding: 10px 15px;
+  margin: 8px 0;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #666;
+}
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #2c5f2d;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  margin-right: 15px;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@media (max-width: 768px) {
+  .shops-grid { grid-template-columns: 1fr; }
+}
+</style>
 </head>
 <body>
 
-<h1 style="text-align:center;color:#4A5D4F;">店舗管理画面</h1>
-<div id="loading" style="text-align:center;padding:20px;">読み込み中...</div>
-<div id="shops" style="max-width:1200px;margin:0 auto;padding:20px;"></div>
+<div class="admin-container">
+  <div class="admin-header">
+    <div class="admin-title">🍞 店舗管理システム</div>
+    <div class="admin-subtitle">ビヨンドグルテンフリー祭り 2025 管理画面</div>
+  </div>
+  
+  <div class="status-section">
+    <div id="status" class="status-loading">
+      <span class="spinner"></span>
+      店舗データを読み込んでいます...
+    </div>
+  </div>
+  
+  <div id="shops-container" class="shops-grid"></div>
+</div>
 
 <script>
-console.log('管理画面スタート');
-
-// 即座に実行
-var apiUrl = 'https://gf-fes-api.bettger1000.workers.dev/api/shops';
-
-fetch(apiUrl)
-  .then(function(response) {
-    console.log('APIレスポンス:', response.status);
-    return response.json();
-  })
-  .then(function(shops) {
-    console.log('店舗数:', shops.length);
+(function() {
+  'use strict';
+  
+  console.log('🍞 店舗管理システム開始');
+  
+  const statusEl = document.getElementById('status');
+  const containerEl = document.getElementById('shops-container');
+  const API_URL = 'https://gf-fes-api.bettger1000.workers.dev/api/shops';
+  
+  loadShopsData();
+  
+  function loadShopsData() {
+    console.log('API呼び出し開始:', API_URL);
     
-    document.getElementById('loading').style.display = 'none';
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', API_URL, true);
+    xhr.timeout = 10000;
     
-    var html = '<h2 style="color:#2c5f2d;text-align:center;margin-bottom:30px;">✅ ' + shops.length + '件の店舗を管理中</h2>';
-    html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:20px;">';
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        try {
+          const shops = JSON.parse(xhr.responseText);
+          console.log('✅ 成功:', shops.length + '件取得');
+          displayShops(shops);
+        } catch (e) {
+          console.error('❌ JSON エラー:', e);
+          showError('データ解析エラー');
+        }
+      } else {
+        console.error('❌ HTTP エラー:', xhr.status);
+        showError('HTTP ' + xhr.status + ' エラー');
+      }
+    };
     
-    shops.forEach(function(shop) {
-      html += '<div style="background:white;border:2px solid #2c5f2d;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">';
-      html += '<h3 style="color:#2c5f2d;margin:0 0 10px 0;">' + shop.name + '</h3>';
-      html += '<p style="margin:5px 0;color:#666;">📍 ' + (shop.address || '住所未設定') + '</p>';
-      
-      if (shop.category && shop.category.length > 0) {
-        html += '<p style="margin:5px 0;color:#666;">🏷️ ' + shop.category.join(', ') + '</p>';
-      }
-      
-      if (shop.targetCustomer) {
-        html += '<p style="margin:5px 0;color:#666;">🎯 ' + shop.targetCustomer + '</p>';
-      }
-      
-      if (shop.concept) {
-        html += '<div style="background:#f0f8f0;padding:10px;margin:10px 0;border-radius:5px;font-style:italic;border-left:3px solid #2c5f2d;">';
-        html += shop.concept;
-        html += '</div>';
-      }
-      
-      html += '</div>';
+    xhr.onerror = function() {
+      console.error('❌ 通信エラー');
+      showError('ネットワークエラー');
+    };
+    
+    xhr.ontimeout = function() {
+      console.error('❌ タイムアウト');
+      showError('タイムアウトエラー');
+    };
+    
+    xhr.send();
+  }
+  
+  function displayShops(shops) {
+    if (!shops || shops.length === 0) {
+      showError('店舗データなし');
+      return;
+    }
+    
+    statusEl.className = 'status-success';
+    statusEl.innerHTML = '✅ ' + shops.length + '件の店舗を管理中';
+    
+    let html = '';
+    shops.forEach(function(shop, index) {
+      html += createShopCard(shop, index + 1);
     });
     
-    html += '</div>';
-    document.getElementById('shops').innerHTML = html;
-    console.log('表示完了');
-  })
-  .catch(function(error) {
-    console.error('エラー:', error);
-    document.getElementById('loading').innerHTML = '❌ エラーが発生しました: ' + error.message;
-  });
+    containerEl.innerHTML = html;
+    console.log('🎉 表示完了');
+  }
+  
+  function createShopCard(shop, num) {
+    let card = '<div class="shop-card">';
+    
+    card += '<div class="shop-header">';
+    card += '<h3 class="shop-name">' + safe(shop.name || '店舗' + num) + '</h3>';
+    card += '<span class="shop-id">' + safe(shop.id || 's' + num) + '</span>';
+    card += '</div>';
+    
+    if (shop.address) {
+      card += '<div class="info-row">';
+      card += '<span class="info-icon">📍</span>';
+      card += '<span class="info-text">' + safe(shop.address) + '</span>';
+      card += '</div>';
+    }
+    
+    if (shop.category && shop.category.length) {
+      card += '<div class="info-row">';
+      card += '<span class="info-icon">🏷️</span>';
+      card += '<div class="tags-container">';
+      shop.category.forEach(function(cat) {
+        card += '<span class="tag">' + safe(cat) + '</span>';
+      });
+      card += '</div>';
+      card += '</div>';
+    }
+    
+    if (shop.targetCustomer) {
+      card += '<div class="info-row">';
+      card += '<span class="info-icon">🎯</span>';
+      card += '<span class="info-text">' + safe(shop.targetCustomer) + '</span>';
+      card += '</div>';
+    }
+    
+    if (shop.concept) {
+      card += '<div class="concept-box">' + safe(shop.concept) + '</div>';
+    }
+    
+    if (shop.menu && shop.menu.length) {
+      card += '<div class="menu-section">';
+      card += '<div class="menu-title">📋 メニュー</div>';
+      shop.menu.forEach(function(item) {
+        card += '<div class="menu-item">';
+        card += safe(item.name || '商品');
+        if (item.price) card += ' - ' + safe(item.price);
+        card += '</div>';
+      });
+      card += '</div>';
+    }
+    
+    card += '</div>';
+    return card;
+  }
+  
+  function showError(msg) {
+    statusEl.className = 'status-error';
+    statusEl.innerHTML = '❌ ' + msg;
+    containerEl.innerHTML = '';
+  }
+  
+  function safe(str) {
+    if (typeof str !== 'string') return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+  
+})();
 </script>
-
-<style>
-body {
-  font-family: 'Noto Sans JP', Arial, sans-serif;
-  background: #F5F3F0;
-  margin: 0;
-  padding: 20px;
-}
-</style>
 
 </body>
 </html>
