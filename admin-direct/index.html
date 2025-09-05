@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍞 店舗管理システム【確実版】</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Hiragino Sans', 'Yu Gothic', Arial, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 20px;
+}
+.wrapper {
+  max-width: 1500px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+.header {
+  background: linear-gradient(135deg, #2c5f2d 0%, #4a7c59 100%);
+  color: white;
+  padding: 40px;
+  text-align: center;
+  position: relative;
+}
+.header::before {
+  content: '🍞';
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 32px;
+  animation: bounce 2s infinite;
+}
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(-5px); }
+}
+.title {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+.subtitle {
+  font-size: 18px;
+  opacity: 0.9;
+}
+.status-panel {
+  padding: 40px;
+  text-align: center;
+  border-bottom: 3px solid #f0f0f0;
+}
+.status-loading {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  color: #d2691e;
+  padding: 25px;
+  border-radius: 15px;
+  font-size: 22px;
+  font-weight: bold;
+}
+.status-success {
+  background: linear-gradient(135deg, #a8e6cf 0%, #7fcdcd 100%);
+  color: #2e7d32;
+  padding: 25px;
+  border-radius: 15px;
+  font-size: 24px;
+  font-weight: bold;
+}
+.status-error {
+  background: linear-gradient(135deg, #ffb3ba 0%, #ff9999 100%);
+  color: #c62828;
+  padding: 25px;
+  border-radius: 15px;
+  font-size: 22px;
+  font-weight: bold;
+}
+.shops-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+  gap: 30px;
+  padding: 40px;
+}
+.shop-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: 3px solid #2c5f2d;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 10px 25px rgba(44, 95, 45, 0.15);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.shop-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, #2c5f2d, #4a7c59);
+}
+.shop-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 35px rgba(44, 95, 45, 0.25);
+}
+.shop-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 3px solid #f0f0f0;
+}
+.shop-name {
+  font-size: 26px;
+  font-weight: bold;
+  color: #2c5f2d;
+  margin: 0;
+}
+.shop-badge {
+  background: linear-gradient(135deg, #2c5f2d, #4a7c59);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: bold;
+}
+.info-line {
+  display: flex;
+  align-items: flex-start;
+  margin: 15px 0;
+  font-size: 16px;
+}
+.info-icon {
+  margin-right: 12px;
+  font-size: 20px;
+  min-width: 30px;
+  flex-shrink: 0;
+}
+.info-content {
+  color: #444;
+  line-height: 1.6;
+  flex: 1;
+}
+.tags-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0;
+}
+.tag-item {
+  background: linear-gradient(135deg, #74b9ff, #0984e3);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 15px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.concept-section {
+  background: linear-gradient(135deg, #e8f5e8, #d1f2d1);
+  padding: 20px;
+  border-radius: 15px;
+  margin: 20px 0;
+  border-left: 5px solid #2c5f2d;
+  font-style: italic;
+  color: #2c5f2d;
+  line-height: 1.7;
+}
+.menu-area {
+  margin-top: 25px;
+  padding-top: 25px;
+  border-top: 3px solid #f0f0f0;
+}
+.menu-header {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2c5f2d;
+  margin-bottom: 15px;
+}
+.menu-entry {
+  background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+  padding: 12px 18px;
+  margin: 8px 0;
+  border-radius: 10px;
+  font-size: 15px;
+  color: #2d3436;
+}
+.loader {
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #2c5f2d;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  margin-right: 15px;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <div class="header">
+    <h1 class="title">店舗管理システム【確実版】</h1>
+    <p class="subtitle">ビヨンドグルテンフリー祭り 2025 - 全データ表示</p>
+  </div>
+  
+  <div class="status-panel">
+    <div id="status" class="status-loading">
+      <span class="loader"></span>
+      店舗データを確実に読み込んでいます...
+    </div>
+  </div>
+  
+  <div id="shops" class="shops-container"></div>
+</div>
+
+<script>
+console.log('🚀 確実版管理システム起動');
+console.log('時刻:', new Date().toLocaleString('ja-JP'));
+
+const statusDiv = document.getElementById('status');
+const shopsDiv = document.getElementById('shops');
+const API_ENDPOINT = 'https://gf-fes-api.bettger1000.workers.dev/api/shops';
+
+console.log('🌐 API:', API_ENDPOINT);
+
+// データ取得実行
+fetchShopsData();
+
+function fetchShopsData() {
+  console.log('📡 データ取得開始');
+  
+  const request = new XMLHttpRequest();
+  request.open('GET', API_ENDPOINT, true);
+  request.timeout = 25000; // 25秒タイムアウト
+  
+  request.onreadystatechange = function() {
+    if (request.readyState === 4) {
+      console.log('📊 応答完了 - ステータス:', request.status);
+      
+      if (request.status === 200) {
+        try {
+          const allShops = JSON.parse(request.responseText);
+          console.log('✅ 解析成功');
+          console.log('📈 店舗数:', allShops.length);
+          console.log('🏪 店舗名一覧:', allShops.map(s => s.name));
+          renderAllShops(allShops);
+        } catch (error) {
+          console.error('❌ JSON解析エラー:', error);
+          showErrorStatus('JSON解析に失敗: ' + error.message);
+        }
+      } else {
+        console.error('❌ HTTPエラー:', request.status);
+        showErrorStatus('HTTPエラー: ' + request.status);
+      }
+    }
+  };
+  
+  request.onerror = function() {
+    console.error('❌ 通信エラー発生');
+    showErrorStatus('ネットワーク通信エラー');
+  };
+  
+  request.ontimeout = function() {
+    console.error('❌ タイムアウト発生');
+    showErrorStatus('25秒でタイムアウト');
+  };
+  
+  console.log('🔄 リクエスト送信中...');
+  request.send();
+}
+
+function renderAllShops(shops) {
+  if (!Array.isArray(shops) || shops.length === 0) {
+    showErrorStatus('店舗データが空または無効');
+    return;
+  }
+  
+  console.log('🎨 レンダリング開始');
+  
+  statusDiv.className = 'status-success';
+  statusDiv.innerHTML = '🎉 ' + shops.length + '店舗のデータを完全表示中！';
+  
+  let htmlContent = '';
+  
+  shops.forEach(function(shop, index) {
+    const shopNumber = index + 1;
+    console.log(`🏪 処理中 ${shopNumber}: ${shop.name || '名前なし'}`);
+    htmlContent += buildShopHTML(shop, shopNumber);
+  });
+  
+  shopsDiv.innerHTML = htmlContent;
+  console.log('✨ 全店舗表示完了！');
+}
+
+function buildShopHTML(shop, number) {
+  let html = '<div class="shop-card">';
+  
+  // ヘッダー
+  html += '<div class="shop-top">';
+  html += '<h2 class="shop-name">' + escapeHTML(shop.name || `店舗${number}`) + '</h2>';
+  html += '<span class="shop-badge">' + escapeHTML(shop.id || `#${number}`) + '</span>';
+  html += '</div>';
+  
+  // 住所
+  if (shop.address) {
+    html += '<div class="info-line">';
+    html += '<span class="info-icon">📍</span>';
+    html += '<span class="info-content"><strong>住所:</strong> ' + escapeHTML(shop.address) + '</span>';
+    html += '</div>';
+  }
+  
+  // カテゴリ
+  if (shop.category && Array.isArray(shop.category) && shop.category.length > 0) {
+    html += '<div class="info-line">';
+    html += '<span class="info-icon">🏷️</span>';
+    html += '<div class="tags-area">';
+    shop.category.forEach(function(category) {
+      html += '<span class="tag-item">' + escapeHTML(category) + '</span>';
+    });
+    html += '</div>';
+    html += '</div>';
+  }
+  
+  // ターゲット顧客
+  if (shop.targetCustomer) {
+    html += '<div class="info-line">';
+    html += '<span class="info-icon">🎯</span>';
+    html += '<span class="info-content"><strong>対象顧客:</strong> ' + escapeHTML(shop.targetCustomer) + '</span>';
+    html += '</div>';
+  }
+  
+  // 特徴
+  if (shop.short) {
+    html += '<div class="info-line">';
+    html += '<span class="info-icon">⭐</span>';
+    html += '<span class="info-content"><strong>特徴:</strong> ' + escapeHTML(shop.short) + '</span>';
+    html += '</div>';
+  }
+  
+  // コンセプト
+  if (shop.concept) {
+    html += '<div class="concept-section">';
+    html += '<strong>💡 コンセプト:</strong><br>' + escapeHTML(shop.concept);
+    html += '</div>';
+  }
+  
+  // メニュー
+  if (shop.menu && Array.isArray(shop.menu) && shop.menu.length > 0) {
+    html += '<div class="menu-area">';
+    html += '<div class="menu-header">🍽️ 提供メニュー</div>';
+    shop.menu.forEach(function(menuItem) {
+      html += '<div class="menu-entry">';
+      html += escapeHTML(menuItem.name || '商品名未設定');
+      if (menuItem.price) {
+        html += ' - <strong>' + escapeHTML(menuItem.price) + '</strong>';
+      }
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+  
+  html += '</div>';
+  return html;
+}
+
+function showErrorStatus(message) {
+  statusDiv.className = 'status-error';
+  statusDiv.innerHTML = '💥 ' + escapeHTML(message);
+  shopsDiv.innerHTML = '';
+}
+
+function escapeHTML(unsafe) {
+  if (typeof unsafe !== 'string') return '';
+  return unsafe
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+</script>
+
+</body>
+</html>
