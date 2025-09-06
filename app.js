@@ -221,8 +221,13 @@ function openModal(shopId) {
   if (shop.thumb && shop.thumb !== 'assets/placeholder.svg') {
     allImages.push(convertImagePath(shop.thumb));
   }
-  if (shop.photos && Array.isArray(shop.photos)) {
-    allImages.push(...shop.photos.filter(photo => photo && photo !== 'assets/placeholder.svg').map(photo => convertImagePath(photo)));
+  if (shop.photos) {
+    if (typeof shop.photos === 'string') {
+      const photos = shop.photos.split('\n').filter(photo => photo.trim() && photo.trim() !== 'assets/placeholder.svg');
+      allImages.push(...photos.map(photo => convertImagePath(photo.trim())));
+    } else if (Array.isArray(shop.photos)) {
+      allImages.push(...shop.photos.filter(photo => photo && photo !== 'assets/placeholder.svg').map(photo => convertImagePath(photo)));
+    }
   }
   
   const mainPhoto = allImages[0] || convertImagePath(shop.thumb) || 'assets/placeholder.svg';
@@ -310,9 +315,10 @@ function openModal(shopId) {
       <div class="modal-section">
         <h3>アレルギー対応</h3>
         <div class="modal-allergy-info">
-          ${shop.allergyInfo.map(allergy => 
-            `<span class="modal-allergy-tag">${allergy}</span>`
-          ).join('')}
+          ${typeof shop.allergyInfo === 'string'
+            ? shop.allergyInfo.split(',').map(allergy => `<span class="modal-allergy-tag">${allergy.trim()}</span>`).join('')
+            : shop.allergyInfo.map(allergy => `<span class="modal-allergy-tag">${allergy}</span>`).join('')
+          }
         </div>
       </div>
     ` : ''}
@@ -330,12 +336,17 @@ function openModal(shopId) {
       <div class="modal-section">
         <h3>メニュー</h3>
         <div class="modal-menu">
-          ${shop.menu.map(item => `
-            <div class="modal-menu-item">
-              <span class="modal-menu-name">${item.name}</span>
-              <span class="modal-menu-price">¥${item.price.toLocaleString()}</span>
-            </div>
-          `).join('')}
+          ${Array.isArray(shop.menu) 
+            ? shop.menu.map(item => `
+                <div class="modal-menu-item">
+                  <span class="modal-menu-name">${item.name}</span>
+                  <span class="modal-menu-price">¥${item.price.toLocaleString()}</span>
+                </div>
+              `).join('')
+            : typeof shop.menu === 'string' 
+              ? `<p class="modal-text">${shop.menu}</p>`
+              : ''
+          }
         </div>
       </div>
     ` : ''}
