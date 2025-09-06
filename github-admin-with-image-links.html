@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>店舗管理システム【画像リンク集対応】- ビヨンドグルテンフリー祭り 2025</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Hiragino Sans', 'Yu Gothic', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+.container { max-width: 1600px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+.header { background: linear-gradient(135deg, #2c5f2d 0%, #4a7c59 100%); color: white; padding: 30px; text-align: center; }
+.header h1 { font-size: 32px; margin-bottom: 10px; }
+.nav { padding: 20px; border-bottom: 2px solid #eee; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+.btn { background: #2c5f2d; color: white; border: none; padding: 12px 24px; border-radius: 25px; font-size: 16px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+.btn-primary { background: #2c5f2d; }
+.btn-add { background: #4a90e2; }
+.btn-export { background: #e74c3c; }
+.btn-import { background: #9b59b6; }
+.btn-images { background: #ff9800; }
+.btn-gray { background: #6c757d; }
+.section { padding: 30px; }
+.status { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); color: #d2691e; padding: 20px; border-radius: 15px; font-size: 18px; font-weight: bold; margin-bottom: 30px; text-align: center; }
+.shops-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 20px; margin-top: 20px; }
+.shop-card { background: white; border: 2px solid #2c5f2d; border-radius: 15px; padding: 20px; box-shadow: 0 5px 15px rgba(44,95,45,0.15); position: relative; }
+.shop-card h3 { color: #2c5f2d; margin-bottom: 15px; font-size: 20px; }
+.shop-info { margin: 10px 0; color: #555; font-size: 14px; line-height: 1.6; }
+.shop-thumb { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; position: absolute; top: 20px; right: 20px; border: 2px solid #ddd; }
+.shop-actions { margin-top: 15px; display: flex; gap: 10px; }
+.btn-edit { background: #4a90e2; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 14px; }
+.btn-delete { background: #e74c3c; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 14px; }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #333; font-size: 14px; }
+.form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; }
+.form-group textarea { resize: vertical; min-height: 100px; }
+.checkbox-group { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 10px; }
+.checkbox-group label { display: flex; align-items: center; font-weight: normal; font-size: 14px; }
+.checkbox-group input { width: auto; margin-right: 5px; }
+.form-actions { text-align: center; margin-top: 30px; }
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto; }
+.modal-content { background: white; width: 95%; max-width: 900px; margin: 30px auto; border-radius: 20px; padding: 30px; max-height: 90vh; overflow-y: auto; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 15px; }
+.modal-close { background: none; border: none; font-size: 30px; cursor: pointer; color: #999; }
+.success { color: #2c5f2d; }
+.error { color: #e74c3c; }
+.loading { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #2c5f2d; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 10px; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.form-section { border-top: 2px solid #eee; margin-top: 30px; padding-top: 20px; }
+.form-section-title { font-size: 18px; color: #2c5f2d; margin-bottom: 15px; font-weight: bold; }
+
+/* 画像リンク集専用スタイル */
+.image-links-section { background: linear-gradient(135deg, #f3e5f5, #e1bee7); border: 3px solid #9c27b0; border-radius: 15px; padding: 25px; margin-bottom: 30px; }
+.image-links-title { color: #6a1b9a; font-size: 24px; font-weight: bold; margin-bottom: 20px; text-align: center; }
+.image-upload-area { background: white; border: 3px dashed #9c27b0; border-radius: 12px; padding: 30px; text-align: center; margin-bottom: 20px; cursor: pointer; transition: all 0.3s; }
+.image-upload-area:hover { border-color: #7b1fa2; background: #f9f9f9; }
+.image-upload-area.dragover { border-color: #4a148c; background: #f3e5f5; transform: scale(1.02); }
+.upload-icon { font-size: 48px; margin-bottom: 15px; color: #9c27b0; }
+.upload-text { font-size: 18px; color: #6a1b9a; font-weight: bold; }
+.upload-subtitle { font-size: 14px; color: #888; margin-top: 8px; }
+.image-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
+.image-item { position: relative; border: 2px solid #ddd; border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); transition: all 0.3s; }
+.image-item:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.15); }
+.image-preview { width: 100%; height: 120px; object-fit: cover; }
+.image-info { padding: 15px; }
+.image-url { font-size: 12px; color: #666; word-break: break-all; margin-bottom: 10px; background: #f5f5f5; padding: 8px; border-radius: 6px; }
+.image-actions { display: flex; gap: 8px; justify-content: center; }
+.btn-copy { background: #4caf50; color: white; border: none; padding: 6px 12px; border-radius: 15px; cursor: pointer; font-size: 12px; transition: all 0.3s; }
+.btn-copy:hover { background: #45a049; }
+.btn-copy.copied { background: #2196f3; }
+.btn-remove-img { background: #f44336; color: white; border: none; padding: 6px 12px; border-radius: 15px; cursor: pointer; font-size: 12px; }
+.images-stats { background: #e8f5e8; border-radius: 8px; padding: 15px; margin-bottom: 15px; text-align: center; color: #2e7d32; font-weight: bold; }
+.quick-paste { display: flex; gap: 10px; margin-top: 15px; align-items: center; }
+.quick-paste input { flex: 1; padding: 10px; border: 2px solid #9c27b0; border-radius: 8px; }
+.quick-paste button { background: #9c27b0; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
+.copy-success { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #4caf50; color: white; padding: 15px 25px; border-radius: 25px; font-weight: bold; z-index: 2000; animation: fadeInOut 2s ease-in-out; }
+@keyframes fadeInOut { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>🍞 店舗管理システム【画像リンク集対応】</h1>
+    <p>ビヨンドグルテンフリー祭り 2025 - 画像管理を簡単に！</p>
+  </div>
+  
+  <div class="nav">
+    <button class="btn btn-primary" onclick="showSection('list')">📋 店舗一覧</button>
+    <button class="btn btn-add" onclick="showSection('add')">➕ 新規登録</button>
+    <button class="btn btn-images" onclick="showSection('images')">📷 画像リンク集</button>
+    <button class="btn btn-import" onclick="document.getElementById('import-file').click()">📥 データインポート</button>
+    <button class="btn btn-export" onclick="exportData()">💾 データエクスポート</button>
+    <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(event)">
+  </div>
+  
+  <!-- 店舗一覧セクション -->
+  <div id="section-list" class="section">
+    <div id="status" class="status">
+      <span class="loading"></span>
+      店舗データを読み込んでいます...
+    </div>
+    <div id="shops-grid" class="shops-grid"></div>
+  </div>
+  
+  <!-- 画像リンク集セクション -->
+  <div id="section-images" class="section" style="display:none;">
+    <div class="image-links-section">
+      <div class="image-links-title">📷 画像リンク集 - アップロード & 管理</div>
+      
+      <div class="images-stats" id="images-stats">
+        アップロード済み画像: <span id="image-count">0</span>枚 | 今すぐ使えるURL集
+      </div>
+      
+      <!-- GitHub Issues アップロードエリア -->
+      <div class="image-upload-area" onclick="window.open('https://github.com/bettger3000/gf-admin/issues/new', '_blank')">
+        <div class="upload-icon">📷</div>
+        <div class="upload-text">クリックしてGitHub Issuesで画像アップロード</div>
+        <div class="upload-subtitle">複数画像を一度にアップロード可能 | 無料・無制限</div>
+      </div>
+      
+      <!-- 手動URL追加 -->
+      <div class="quick-paste">
+        <input type="text" id="manual-url-input" placeholder="画像URLを直接入力（https://user-images.githubusercontent.com/...）">
+        <button onclick="addManualURL()">➕ 追加</button>
+      </div>
+      
+      <!-- アップロード済み画像ギャラリー -->
+      <div id="image-gallery" class="image-gallery"></div>
+    </div>
+  </div>
+  
+  <!-- 新規登録セクション -->
+  <div id="section-add" class="section" style="display:none;">
+    <h2 style="text-align:center;color:#2c5f2d;margin-bottom:30px;">新規店舗登録</h2>
+    
+    <!-- 画像クイック選択 -->
+    <div style="background:#e8f5e8;border-radius:12px;padding:20px;margin-bottom:30px;">
+      <h3 style="color:#2e7d32;margin-bottom:15px;">📷 画像クイック選択</h3>
+      <p style="color:#666;margin-bottom:15px;">画像リンク集から選択するか、下の欄に直接URLを入力してください</p>
+      <button type="button" onclick="showImageSelector()" style="background:#4caf50;color:white;border:none;padding:10px 20px;border-radius:20px;cursor:pointer;">📷 画像リンク集から選択</button>
+    </div>
+    
+    <form id="add-form" style="max-width:900px;margin:0 auto;">
+      
+      <!-- 基本情報 -->
+      <div class="form-section-title">📝 基本情報</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>店舗名 *</label>
+          <input type="text" id="add-name" required>
+        </div>
+        <div class="form-group">
+          <label>簡潔な説明</label>
+          <input type="text" id="add-short" placeholder="例: 米粉パンケーキの専門店">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>コンセプト</label>
+        <textarea id="add-concept" placeholder="お店のコンセプトや想い"></textarea>
+      </div>
+      
+      <!-- カテゴリ・タグ -->
+      <div class="form-section">
+        <div class="form-section-title">🏷️ カテゴリ・タグ</div>
+        <div class="form-group">
+          <label>カテゴリ（複数選択可）</label>
+          <div class="checkbox-group">
+            <label><input type="checkbox" name="category" value="スイーツ"> スイーツ</label>
+            <label><input type="checkbox" name="category" value="食事"> 食事</label>
+            <label><input type="checkbox" name="category" value="パン"> パン</label>
+            <label><input type="checkbox" name="category" value="ドリンク"> ドリンク</label>
+            <label><input type="checkbox" name="category" value="調味料"> 調味料</label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>タグ（複数選択可）</label>
+          <div class="checkbox-group">
+            <label><input type="checkbox" name="tags" value="小麦不使用"> 小麦不使用</label>
+            <label><input type="checkbox" name="tags" value="卵不使用"> 卵不使用</label>
+            <label><input type="checkbox" name="tags" value="乳不使用"> 乳不使用</label>
+            <label><input type="checkbox" name="tags" value="ナッツ不使用"> ナッツ不使用</label>
+            <label><input type="checkbox" name="tags" value="ヴィーガン対応"> ヴィーガン対応</label>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 写真セクション -->
+      <div class="form-section">
+        <div class="form-section-title">📷 写真</div>
+        
+        <div class="form-group">
+          <label>サムネイル画像URL</label>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <input type="text" id="add-thumb" placeholder="https://user-images.githubusercontent.com/..." style="flex:1;">
+            <button type="button" onclick="showImageSelector('thumb')" style="background:#4caf50;color:white;border:none;padding:10px 15px;border-radius:8px;cursor:pointer;">📷 選択</button>
+          </div>
+          <img id="thumb-preview" style="max-width:200px;max-height:200px;border-radius:8px;margin-top:10px;display:none;">
+        </div>
+        
+        <div class="form-group">
+          <label>追加写真URLs（複数可、改行区切り）</label>
+          <textarea id="add-photos" rows="4" placeholder="https://user-images.githubusercontent.com/xxx/yyy.jpg&#10;https://user-images.githubusercontent.com/xxx/zzz.jpg"></textarea>
+          <button type="button" onclick="showImageSelector('photos')" style="background:#4caf50;color:white;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;margin-top:10px;">📷 複数画像を選択</button>
+        </div>
+      </div>
+      
+      <!-- アクセス情報 -->
+      <div class="form-section">
+        <div class="form-section-title">📍 基本情報</div>
+        <div class="form-group">
+          <label>住所</label>
+          <input type="text" id="add-address" placeholder="例: 東京都渋谷区...">
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>ウェブサイト</label>
+            <input type="url" id="add-site" placeholder="https://example.com">
+          </div>
+          <div class="form-group">
+            <label>Instagram</label>
+            <input type="url" id="add-instagram" placeholder="https://instagram.com/...">
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">💾 登録する</button>
+        <button type="button" class="btn btn-gray" onclick="resetForm()">リセット</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 編集モーダル -->
+<div id="edit-modal" class="modal">
+  <div class="modal-content" style="max-width:900px;">
+    <div class="modal-header">
+      <h2 style="color:#2c5f2d;">✏️ 店舗情報編集</h2>
+      <button class="modal-close" onclick="closeEditModal()">&times;</button>
+    </div>
+    
+    <div style="padding:20px;">
+      <!-- 画像クイック選択 -->
+      <div style="background:#e8f5e8;border-radius:12px;padding:20px;margin-bottom:30px;">
+        <h3 style="color:#2e7d32;margin-bottom:15px;">📷 画像クイック選択</h3>
+        <p style="color:#666;margin-bottom:15px;">画像リンク集から選択するか、下の欄に直接URLを入力してください</p>
+        <button type="button" onclick="showImageSelector('edit')" style="background:#4caf50;color:white;border:none;padding:10px 20px;border-radius:20px;cursor:pointer;">📷 画像リンク集から選択</button>
+      </div>
+      
+      <form id="edit-form">
+        <input type="hidden" id="edit-id">
+        
+        <!-- 基本情報 -->
+        <div class="form-section-title">📝 基本情報</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>店舗名 *</label>
+            <input type="text" id="edit-name" required>
+          </div>
+          <div class="form-group">
+            <label>簡潔な説明</label>
+            <input type="text" id="edit-short" placeholder="例: 米粉パンケーキの専門店">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>コンセプト</label>
+          <textarea id="edit-concept" placeholder="お店のコンセプトや想い"></textarea>
+        </div>
+        
+        <!-- カテゴリ・タグ -->
+        <div class="form-section">
+          <div class="form-section-title">🏷️ カテゴリ・タグ</div>
+          <div class="form-group">
+            <label>カテゴリ（複数選択可）</label>
+            <div class="checkbox-group" id="edit-categories">
+              <label><input type="checkbox" name="edit-category" value="スイーツ"> スイーツ</label>
+              <label><input type="checkbox" name="edit-category" value="食事"> 食事</label>
+              <label><input type="checkbox" name="edit-category" value="パン"> パン</label>
+              <label><input type="checkbox" name="edit-category" value="ドリンク"> ドリンク</label>
+              <label><input type="checkbox" name="edit-category" value="調味料"> 調味料</label>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>タグ（複数選択可）</label>
+            <div class="checkbox-group" id="edit-tags">
+              <label><input type="checkbox" name="edit-tags" value="小麦不使用"> 小麦不使用</label>
+              <label><input type="checkbox" name="edit-tags" value="卵不使用"> 卵不使用</label>
+              <label><input type="checkbox" name="edit-tags" value="乳不使用"> 乳不使用</label>
+              <label><input type="checkbox" name="edit-tags" value="ナッツ不使用"> ナッツ不使用</label>
+              <label><input type="checkbox" name="edit-tags" value="ヴィーガン対応"> ヴィーガン対応</label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 写真セクション -->
+        <div class="form-section">
+          <div class="form-section-title">📷 写真</div>
+          
+          <div class="form-group">
+            <label>サムネイル画像URL</label>
+            <div style="display:flex;gap:10px;align-items:center;">
+              <input type="text" id="edit-thumb" placeholder="https://user-images.githubusercontent.com/..." style="flex:1;">
+              <button type="button" onclick="showImageSelector('edit-thumb')" style="background:#4caf50;color:white;border:none;padding:10px 15px;border-radius:8px;cursor:pointer;">📷 選択</button>
+            </div>
+            <img id="edit-thumb-preview" style="max-width:200px;max-height:200px;border-radius:8px;margin-top:10px;display:none;">
+          </div>
+          
+          <div class="form-group">
+            <label>追加写真URLs（複数可、改行区切り）</label>
+            <textarea id="edit-photos" rows="4" placeholder="https://user-images.githubusercontent.com/xxx/yyy.jpg&#10;https://user-images.githubusercontent.com/xxx/zzz.jpg"></textarea>
+            <button type="button" onclick="showImageSelector('edit-photos')" style="background:#4caf50;color:white;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;margin-top:10px;">📷 複数画像を選択</button>
+          </div>
+        </div>
+        
+        <!-- アクセス情報 -->
+        <div class="form-section">
+          <div class="form-section-title">📍 基本情報</div>
+          <div class="form-group">
+            <label>住所</label>
+            <input type="text" id="edit-address" placeholder="例: 東京都渋谷区...">
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>ウェブサイト</label>
+              <input type="url" id="edit-site" placeholder="https://example.com">
+            </div>
+            <div class="form-group">
+              <label>Instagram</label>
+              <input type="url" id="edit-instagram" placeholder="https://instagram.com/...">
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">💾 更新する</button>
+          <button type="button" class="btn btn-gray" onclick="closeEditModal()">キャンセル</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 画像選択モーダル -->
+<div id="image-selector-modal" class="modal">
+  <div class="modal-content" style="max-width:1000px;">
+    <div class="modal-header">
+      <h2 style="color:#2c5f2d;">📷 画像を選択</h2>
+      <button class="modal-close" onclick="closeImageSelector()">&times;</button>
+    </div>
+    
+    <div style="padding:20px;">
+      <p style="margin-bottom:20px;color:#666;">クリックして画像URLを選択してください</p>
+      <div id="modal-image-gallery" class="image-gallery"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = 'https://gf-fes-api.bettger1000.workers.dev/api';
+let shops = [];
+let imageLinks = JSON.parse(localStorage.getItem('imageLinks') || '[]');
+let currentImageTarget = null;
+
+// 初期化
+window.onload = function() {
+  loadShops();
+  displayImageGallery();
+  
+  document.getElementById('add-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    addShop();
+  });
+  
+  // 編集フォーム送信イベント
+  document.getElementById('edit-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    updateShop();
+  });
+  
+  // 編集画像URL入力時のプレビュー
+  document.getElementById('edit-thumb').addEventListener('input', function() {
+    const preview = document.getElementById('edit-thumb-preview');
+    if (this.value && !this.value.endsWith('.svg')) {
+      preview.src = this.value;
+      preview.style.display = 'block';
+      preview.onerror = function() { this.style.display = 'none'; };
+    } else {
+      preview.style.display = 'none';
+    }
+  });
+  
+  // 画像URL入力時のプレビュー
+  document.getElementById('add-thumb').addEventListener('input', function() {
+    const preview = document.getElementById('thumb-preview');
+    if (this.value && !this.value.endsWith('.svg')) {
+      preview.src = this.value;
+      preview.style.display = 'block';
+      preview.onerror = function() { this.style.display = 'none'; };
+    } else {
+      preview.style.display = 'none';
+    }
+  });
+};
+
+// セクション表示切り替え
+function showSection(section) {
+  document.getElementById('section-list').style.display = section === 'list' ? 'block' : 'none';
+  document.getElementById('section-add').style.display = section === 'add' ? 'block' : 'none';
+  document.getElementById('section-images').style.display = section === 'images' ? 'block' : 'none';
+  
+  if (section === 'list') {
+    loadShops();
+  } else if (section === 'images') {
+    displayImageGallery();
+  }
+}
+
+// 画像リンクギャラリー表示
+function displayImageGallery() {
+  const gallery = document.getElementById('image-gallery');
+  const stats = document.getElementById('image-count');
+  
+  stats.textContent = imageLinks.length;
+  
+  if (imageLinks.length === 0) {
+    gallery.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#666;font-size:18px;padding:40px;">まだ画像がアップロードされていません<br><br>上のエリアをクリックしてGitHub Issuesで画像をアップロードしてください</p>';
+    return;
+  }
+  
+  gallery.innerHTML = imageLinks.map((url, index) => `
+    <div class="image-item">
+      <img src="${url}" alt="画像 ${index + 1}" class="image-preview" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22120%22 viewBox=%220 0 200 120%22%3E%3Crect width=%22200%22 height=%22120%22 fill=%22%23ddd%22/%3E%3Ctext x=%22100%22 y=%2260%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22%3E画像エラー%3C/text%3E%3C/svg%3E'">
+      <div class="image-info">
+        <div class="image-url">${url}</div>
+        <div class="image-actions">
+          <button class="btn-copy" onclick="copyToClipboard('${url}', this)">📋 コピー</button>
+          <button class="btn-remove-img" onclick="removeImageLink(${index})">🗑️ 削除</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// 手動URL追加
+function addManualURL() {
+  const input = document.getElementById('manual-url-input');
+  const url = input.value.trim();
+  
+  if (!url) {
+    alert('URLを入力してください');
+    return;
+  }
+  
+  if (!url.includes('user-images.githubusercontent.com') && !url.startsWith('http')) {
+    alert('有効なURLを入力してください\n（https://user-images.githubusercontent.com/ で始まるURL）');
+    return;
+  }
+  
+  if (imageLinks.includes(url)) {
+    alert('この画像は既に追加されています');
+    return;
+  }
+  
+  imageLinks.push(url);
+  localStorage.setItem('imageLinks', JSON.stringify(imageLinks));
+  input.value = '';
+  displayImageGallery();
+  showCopySuccess('画像リンクを追加しました！');
+}
+
+// 画像リンク削除
+function removeImageLink(index) {
+  if (confirm('この画像リンクを削除しますか？')) {
+    imageLinks.splice(index, 1);
+    localStorage.setItem('imageLinks', JSON.stringify(imageLinks));
+    displayImageGallery();
+  }
+}
+
+// クリップボードにコピー
+function copyToClipboard(text, button) {
+  navigator.clipboard.then ? navigator.clipboard.writeText(text).then(() => {
+    const originalText = button.innerHTML;
+    button.innerHTML = '✅ コピー済み';
+    button.classList.add('copied');
+    setTimeout(() => {
+      button.innerHTML = originalText;
+      button.classList.remove('copied');
+    }, 2000);
+    showCopySuccess('URLをコピーしました！');
+  }) : (() => {
+    // Fallback for older browsers
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    showCopySuccess('URLをコピーしました！');
+  })();
+}
+
+// 編集モーダル表示
+function showEditModal(shop) {
+  document.getElementById('edit-id').value = shop.id.toString();
+  document.getElementById('edit-name').value = shop.name || '';
+  document.getElementById('edit-short').value = shop.short || '';
+  document.getElementById('edit-concept').value = shop.concept || '';
+  document.getElementById('edit-address').value = shop.address || '';
+  document.getElementById('edit-thumb').value = shop.thumb || '';
+  document.getElementById('edit-photos').value = shop.photos ? shop.photos.join('\n') : '';
+  document.getElementById('edit-site').value = shop.links?.site || '';
+  document.getElementById('edit-instagram').value = shop.links?.instagram || '';
+  
+  // サムネイルプレビュー設定
+  const preview = document.getElementById('edit-thumb-preview');
+  if (shop.thumb && !shop.thumb.endsWith('.svg')) {
+    preview.src = shop.thumb;
+    preview.style.display = 'block';
+  } else {
+    preview.style.display = 'none';
+  }
+  
+  // チェックボックスをリセット
+  document.querySelectorAll('#edit-modal input[type="checkbox"]').forEach(cb => {
+    cb.checked = false;
+  });
+  
+  // カテゴリを設定
+  if (shop.category) {
+    shop.category.forEach(cat => {
+      const cb = document.querySelector(`input[name="edit-category"][value="${cat}"]`);
+      if (cb) cb.checked = true;
+    });
+  }
+  
+  // タグを設定
+  if (shop.tags) {
+    shop.tags.forEach(tag => {
+      const cb = document.querySelector(`input[name="edit-tags"][value="${tag}"]`);
+      if (cb) cb.checked = true;
+    });
+  }
+  
+  document.getElementById('edit-modal').style.display = 'block';
+}
+
+// 編集モーダルを閉じる
+function closeEditModal() {
+  document.getElementById('edit-modal').style.display = 'none';
+}
+
+// 画像選択モーダル表示
+function showImageSelector(target) {
+  currentImageTarget = target;
+  const modal = document.getElementById('image-selector-modal');
+  const gallery = document.getElementById('modal-image-gallery');
+  
+  if (imageLinks.length === 0) {
+    alert('まず画像リンク集で画像をアップロードしてください');
+    showSection('images');
+    return;
+  }
+  
+  gallery.innerHTML = imageLinks.map((url, index) => `
+    <div class="image-item" onclick="selectImage('${url}')" style="cursor:pointer;">
+      <img src="${url}" alt="画像 ${index + 1}" class="image-preview">
+      <div class="image-info">
+        <div style="text-align:center;padding:10px;">
+          <button class="btn-copy" onclick="event.stopPropagation(); selectImage('${url}')">✅ この画像を選択</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  
+  modal.style.display = 'block';
+}
+
+// 画像選択
+function selectImage(url) {
+  if (currentImageTarget === 'thumb') {
+    document.getElementById('add-thumb').value = url;
+    document.getElementById('thumb-preview').src = url;
+    document.getElementById('thumb-preview').style.display = 'block';
+  } else if (currentImageTarget === 'photos') {
+    const textarea = document.getElementById('add-photos');
+    textarea.value += (textarea.value ? '\n' : '') + url;
+  } else if (currentImageTarget === 'edit-thumb') {
+    document.getElementById('edit-thumb').value = url;
+    document.getElementById('edit-thumb-preview').src = url;
+    document.getElementById('edit-thumb-preview').style.display = 'block';
+  } else if (currentImageTarget === 'edit-photos') {
+    const textarea = document.getElementById('edit-photos');
+    textarea.value += (textarea.value ? '\n' : '') + url;
+  }
+  closeImageSelector();
+  showCopySuccess('画像を選択しました！');
+}
+
+// 画像選択モーダルを閉じる
+function closeImageSelector() {
+  document.getElementById('image-selector-modal').style.display = 'none';
+  currentImageTarget = null;
+}
+
+// 成功メッセージ表示
+function showCopySuccess(message) {
+  const successDiv = document.createElement('div');
+  successDiv.className = 'copy-success';
+  successDiv.textContent = message;
+  document.body.appendChild(successDiv);
+  setTimeout(() => document.body.removeChild(successDiv), 2000);
+}
+
+// 店舗一覧読み込み
+function loadShops() {
+  const statusDiv = document.getElementById('status');
+  statusDiv.innerHTML = '<span class="loading"></span>店舗データを読み込んでいます...';
+  
+  fetch(API_BASE + '/shops')
+    .then(response => response.json())
+    .then(data => {
+      shops = data;
+      displayShops();
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      statusDiv.innerHTML = '<span class="error">❌ データ読み込みエラー</span>';
+    });
+}
+
+// 店舗一覧表示
+function displayShops() {
+  const statusDiv = document.getElementById('status');
+  const gridDiv = document.getElementById('shops-grid');
+  
+  if (!shops || shops.length === 0) {
+    statusDiv.innerHTML = '<span class="error">登録済み店舗がありません</span>';
+    gridDiv.innerHTML = '';
+    return;
+  }
+  
+  statusDiv.innerHTML = `<span class="success">✅ ${shops.length}件の店舗を管理中</span>`;
+  
+  let html = '';
+  shops.forEach(shop => {
+    html += `
+      <div class="shop-card">
+        ${shop.thumb && !shop.thumb.endsWith('.svg') ? `<img src="${shop.thumb}" alt="${shop.name}" class="shop-thumb" onerror="this.style.display='none'">` : ''}
+        <h3>${shop.name || '名前未設定'}</h3>
+        ${shop.short ? `<div class="shop-info">📝 ${shop.short}</div>` : ''}
+        ${shop.address ? `<div class="shop-info">📍 ${shop.address}</div>` : ''}
+        ${shop.category && shop.category.length ? `<div class="shop-info">🏷️ ${shop.category.join(', ')}</div>` : ''}
+        ${shop.tags && shop.tags.length ? `<div class="shop-info">🔖 ${shop.tags.join(', ')}</div>` : ''}
+        <div class="shop-actions">
+          <button class="btn-edit" onclick="editShop('${shop.id}')">✏️ 編集</button>
+          <button class="btn-delete" onclick="deleteShop('${shop.id}')">🗑️ 削除</button>
+        </div>
+      </div>
+    `;
+  });
+  
+  gridDiv.innerHTML = html;
+}
+
+// 新規店舗追加
+function addShop() {
+  const name = document.getElementById('add-name').value.trim();
+  if (!name) {
+    alert('店舗名を入力してください');
+    return;
+  }
+  
+  const categories = [];
+  document.querySelectorAll('input[name="category"]:checked').forEach(cb => {
+    categories.push(cb.value);
+  });
+  
+  const tags = [];
+  document.querySelectorAll('input[name="tags"]:checked').forEach(cb => {
+    tags.push(cb.value);
+  });
+  
+  const photosText = document.getElementById('add-photos').value.trim();
+  const photos = photosText ? photosText.split('\n').map(p => p.trim()).filter(p => p) : [];
+  
+  const shopData = {
+    name: name,
+    short: document.getElementById('add-short').value.trim(),
+    concept: document.getElementById('add-concept').value.trim(),
+    category: categories,
+    tags: tags,
+    address: document.getElementById('add-address').value.trim(),
+    thumb: document.getElementById('add-thumb').value.trim(),
+    photos: photos,
+    links: {
+      site: document.getElementById('add-site').value.trim(),
+      instagram: document.getElementById('add-instagram').value.trim()
+    }
+  };
+  
+  fetch(API_BASE + '/shops', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(shopData)
+  })
+  .then(response => {
+    if (response.ok) {
+      alert('✅ 店舗を登録しました！');
+      resetForm();
+      showSection('list');
+    } else {
+      alert('❌ 登録に失敗しました');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('❌ 通信エラーが発生しました');
+  });
+}
+
+// 店舗編集
+function editShop(id) {
+  const shop = shops.find(s => s.id === id);
+  if (!shop) return;
+  
+  // 編集モーダルを表示
+  showEditModal(shop);
+}
+
+// 店舗削除
+function deleteShop(id) {
+  const shop = shops.find(s => s.id === id);
+  if (!shop) return;
+  
+  if (!confirm(`「${shop.name}」を削除しますか？\nこの操作は取り消せません。`)) {
+    return;
+  }
+  
+  fetch(API_BASE + '/shops/' + id.split(':')[0], {
+    method: 'DELETE'
+  })
+  .then(response => {
+    if (response.ok) {
+      alert('✅ 店舗を削除しました');
+      loadShops();
+    } else {
+      alert('❌ 削除に失敗しました');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('❌ 通信エラーが発生しました');
+  });
+}
+
+// フォームリセット
+function resetForm() {
+  document.getElementById('add-form').reset();
+  document.getElementById('thumb-preview').style.display = 'none';
+}
+
+// データエクスポート
+function exportData() {
+  if (!shops || shops.length === 0) {
+    alert('エクスポートするデータがありません');
+    return;
+  }
+  
+  const jsonStr = JSON.stringify(shops, null, 2);
+  const blob = new Blob([jsonStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'shops-' + new Date().toISOString().slice(0,10) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  alert(`✅ ${shops.length}件のデータをエクスポートしました`);
+}
+
+// データインポート
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const importedShops = JSON.parse(e.target.result);
+      if (!Array.isArray(importedShops)) {
+        alert('❌ 無効なデータ形式です');
+        return;
+      }
+      
+      if (confirm(`${importedShops.length}件のデータをインポートしますか？\n既存のデータに追加されます。`)) {
+        let successCount = 0;
+        let promises = importedShops.map(shop => {
+          return fetch(API_BASE + '/shops', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(shop)
+          })
+          .then(response => {
+            if (response.ok) successCount++;
+          })
+          .catch(error => console.error('Import error:', error));
+        });
+        
+        Promise.all(promises).then(() => {
+          alert(`✅ ${successCount}件のデータをインポートしました`);
+          loadShops();
+        });
+      }
+    } catch (error) {
+      alert('❌ ファイルの読み込みに失敗しました');
+      console.error('Import error:', error);
+    }
+  };
+  
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// 店舗更新
+function updateShop() {
+  const id = document.getElementById('edit-id').value.split(':')[0];
+  const name = document.getElementById('edit-name').value.trim();
+  
+  if (!name) {
+    alert('店舗名を入力してください');
+    return;
+  }
+  
+  const categories = [];
+  document.querySelectorAll('input[name="edit-category"]:checked').forEach(cb => {
+    categories.push(cb.value);
+  });
+  
+  const tags = [];
+  document.querySelectorAll('input[name="edit-tags"]:checked').forEach(cb => {
+    tags.push(cb.value);
+  });
+  
+  const photosText = document.getElementById('edit-photos').value.trim();
+  const photos = photosText ? photosText.split('\n').map(p => p.trim()).filter(p => p) : [];
+  
+  const shopData = {
+    name: name,
+    short: document.getElementById('edit-short').value.trim(),
+    concept: document.getElementById('edit-concept').value.trim(),
+    category: categories,
+    tags: tags,
+    address: document.getElementById('edit-address').value.trim(),
+    thumb: document.getElementById('edit-thumb').value.trim(),
+    photos: photos,
+    links: {
+      site: document.getElementById('edit-site').value.trim(),
+      instagram: document.getElementById('edit-instagram').value.trim()
+    }
+  };
+  
+  fetch(API_BASE + '/shops/' + id, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(shopData)
+  })
+  .then(response => {
+    if (response.ok) {
+      alert('✅ 店舗情報を更新しました！');
+      closeEditModal();
+      loadShops();
+    } else {
+      alert('❌ 更新に失敗しました');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('❌ 通信エラーが発生しました');
+  });
+}
+</script>
+
+</body>
+</html>
