@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>完全版店舗管理システム - ビヨンドグルテンフリー祭り 2025</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Hiragino Sans', 'Yu Gothic', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+.container { max-width: 1600px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+.header { background: linear-gradient(135deg, #2c5f2d 0%, #4a7c59 100%); color: white; padding: 30px; text-align: center; }
+.header h1 { font-size: 32px; margin-bottom: 10px; }
+.nav { padding: 20px; border-bottom: 2px solid #eee; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+.btn { background: #2c5f2d; color: white; border: none; padding: 12px 24px; border-radius: 25px; font-size: 16px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+.btn-primary { background: #2c5f2d; }
+.btn-add { background: #4a90e2; }
+.btn-export { background: #e74c3c; }
+.btn-gray { background: #6c757d; }
+.section { padding: 30px; }
+.status { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); color: #d2691e; padding: 20px; border-radius: 15px; font-size: 18px; font-weight: bold; margin-bottom: 30px; text-align: center; }
+.shops-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 20px; margin-top: 20px; }
+.shop-card { background: white; border: 2px solid #2c5f2d; border-radius: 15px; padding: 20px; box-shadow: 0 5px 15px rgba(44,95,45,0.15); position: relative; }
+.shop-card h3 { color: #2c5f2d; margin-bottom: 15px; font-size: 20px; }
+.shop-info { margin: 10px 0; color: #555; font-size: 14px; line-height: 1.6; }
+.shop-thumb { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; position: absolute; top: 20px; right: 20px; border: 2px solid #ddd; }
+.shop-actions { margin-top: 15px; display: flex; gap: 10px; }
+.btn-edit { background: #4a90e2; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 14px; }
+.btn-delete { background: #e74c3c; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 14px; }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #333; font-size: 14px; }
+.form-group input, .form-group textarea { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; }
+.form-group textarea { resize: vertical; min-height: 100px; }
+.form-actions { text-align: center; margin-top: 30px; }
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto; }
+.modal-content { background: white; width: 95%; max-width: 800px; margin: 30px auto; border-radius: 20px; padding: 30px; max-height: 90vh; overflow-y: auto; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 15px; }
+.modal-close { background: none; border: none; font-size: 30px; cursor: pointer; color: #999; }
+.success { color: #2c5f2d; }
+.error { color: #e74c3c; }
+.loading { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #2c5f2d; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 10px; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.image-preview { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; margin-top: 10px; }
+.api-status { background: #e8f5e8; color: #2e7d32; padding: 10px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>🍞 完全版店舗管理システム</h1>
+    <p>ビヨンドグルテンフリー祭り 2025 - 完全修正版</p>
+  </div>
+  
+  <div class="nav">
+    <button class="btn btn-primary" onclick="showSection('list')">📋 店舗一覧</button>
+    <button class="btn btn-add" onclick="showSection('add')">➕ 新規登録</button>
+    <button class="btn btn-export" onclick="exportData()">💾 データエクスポート</button>
+  </div>
+  
+  <!-- API Status -->
+  <div class="api-status">
+    ✅ 新API接続済み: https://gf-fes-api-complete.bettger1000.workers.dev/api
+  </div>
+  
+  <!-- 店舗一覧セクション -->
+  <div id="section-list" class="section">
+    <div id="status" class="status">
+      <span class="loading"></span>
+      データを読み込んでいます...
+    </div>
+    <div id="shops-grid" class="shops-grid"></div>
+  </div>
+
+  <!-- 新規登録セクション -->
+  <div id="section-add" class="section" style="display:none;">
+    <h2>新規店舗登録</h2>
+    <div class="form-group">
+      <label for="add-name">店舗名 *</label>
+      <input type="text" id="add-name" required>
+    </div>
+    <div class="form-group">
+      <label for="add-short">短い説明</label>
+      <input type="text" id="add-short" placeholder="例: 米粉ケーキとスペシャリティコーヒーの専門店">
+    </div>
+    <div class="form-group">
+      <label for="add-concept">コンセプト</label>
+      <textarea id="add-concept" placeholder="店舗のコンセプトや理念"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="add-address">住所</label>
+      <input type="text" id="add-address" placeholder="例: 豊明市沓掛町">
+    </div>
+    <div class="form-group">
+      <label for="add-thumb">サムネイル画像URL</label>
+      <input type="url" id="add-thumb" placeholder="https://example.com/image.jpg">
+      <img id="thumb-preview" class="image-preview" style="display:none;">
+    </div>
+    <div class="form-group">
+      <label for="add-photos">追加写真URLs（1行1URL）</label>
+      <textarea id="add-photos" placeholder="https://example.com/photo1.jpg&#10;https://example.com/photo2.jpg"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="add-site">ウェブサイト</label>
+        <input type="url" id="add-site" placeholder="https://example.com">
+      </div>
+      <div class="form-group">
+        <label for="add-instagram">Instagram</label>
+        <input type="url" id="add-instagram" placeholder="https://instagram.com/username">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-add" onclick="addShop()">📝 登録する</button>
+      <button class="btn btn-gray" onclick="showSection('list')">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<!-- 編集モーダル -->
+<div id="edit-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>店舗編集</h2>
+      <button class="modal-close" onclick="closeEditModal()">&times;</button>
+    </div>
+    <input type="hidden" id="edit-id">
+    <div class="form-group">
+      <label for="edit-name">店舗名 *</label>
+      <input type="text" id="edit-name" required>
+    </div>
+    <div class="form-group">
+      <label for="edit-short">短い説明</label>
+      <input type="text" id="edit-short">
+    </div>
+    <div class="form-group">
+      <label for="edit-concept">コンセプト</label>
+      <textarea id="edit-concept"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="edit-address">住所</label>
+      <input type="text" id="edit-address">
+    </div>
+    <div class="form-group">
+      <label for="edit-thumb">サムネイル画像URL</label>
+      <input type="url" id="edit-thumb">
+      <img id="edit-thumb-preview" class="image-preview" style="display:none;">
+    </div>
+    <div class="form-group">
+      <label for="edit-photos">追加写真URLs（1行1URL）</label>
+      <textarea id="edit-photos"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="edit-site">ウェブサイト</label>
+        <input type="url" id="edit-site">
+      </div>
+      <div class="form-group">
+        <label for="edit-instagram">Instagram</label>
+        <input type="url" id="edit-instagram">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="updateShop()">📝 更新する</button>
+      <button class="btn btn-gray" onclick="closeEditModal()">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// 新しい完全版APIを使用
+const API_BASE = 'https://gf-fes-api-complete.bettger1000.workers.dev/api';
+let shops = [];
+
+// 初期化
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🚀 完全版管理システム初期化中...');
+  loadShops();
+  
+  // 画像プレビュー機能
+  setupImagePreviews();
+  
+  console.log('✅ 初期化完了');
+});
+
+// 画像プレビュー設定
+function setupImagePreviews() {
+  document.getElementById('add-thumb').addEventListener('input', function() {
+    const preview = document.getElementById('thumb-preview');
+    showImagePreview(this.value, preview);
+  });
+  
+  document.getElementById('edit-thumb').addEventListener('input', function() {
+    const preview = document.getElementById('edit-thumb-preview');
+    showImagePreview(this.value, preview);
+  });
+}
+
+// 画像プレビュー表示
+function showImagePreview(url, previewElement) {
+  if (url && url.startsWith('http')) {
+    previewElement.src = url;
+    previewElement.style.display = 'block';
+    previewElement.onerror = function() { 
+      this.style.display = 'none';
+      console.log('画像の読み込みに失敗:', url);
+    };
+  } else {
+    previewElement.style.display = 'none';
+  }
+}
+
+// セクション表示切替
+function showSection(sectionName) {
+  document.querySelectorAll('.section').forEach(section => {
+    section.style.display = 'none';
+  });
+  document.getElementById('section-' + sectionName).style.display = 'block';
+}
+
+// 店舗データ読み込み
+function loadShops() {
+  console.log('📊 店舗データを読み込み中...');
+  fetch(API_BASE + '/shops')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      shops = data;
+      console.log(`✅ ${shops.length}件の店舗データを読み込み完了`);
+      displayShops();
+    })
+    .catch(error => {
+      console.error('❌ データ読み込みエラー:', error);
+      document.getElementById('status').innerHTML = `<span class="error">❌ データの読み込みに失敗しました: ${error.message}</span>`;
+    });
+}
+
+// 店舗一覧表示
+function displayShops() {
+  const statusDiv = document.getElementById('status');
+  const gridDiv = document.getElementById('shops-grid');
+  
+  if (!shops || shops.length === 0) {
+    statusDiv.innerHTML = '<span class="error">登録済み店舗がありません</span>';
+    gridDiv.innerHTML = '';
+    return;
+  }
+  
+  statusDiv.innerHTML = `<span class="success">✅ ${shops.length}件の店舗を管理中</span>`;
+  
+  let html = '';
+  shops.forEach(shop => {
+    const categories = Array.isArray(shop.category) ? shop.category.join(', ') : '';
+    const tags = Array.isArray(shop.tags) ? shop.tags.join(', ') : '';
+    
+    html += `
+      <div class="shop-card">
+        ${shop.thumb ? `<img src="${shop.thumb}" alt="${shop.name}" class="shop-thumb" onerror="this.style.display='none'">` : ''}
+        <h3>${shop.name || '名前未設定'}</h3>
+        ${shop.short ? `<div class="shop-info">📝 ${shop.short}</div>` : ''}
+        ${shop.address ? `<div class="shop-info">📍 ${shop.address}</div>` : ''}
+        ${categories ? `<div class="shop-info">🏷️ ${categories}</div>` : ''}
+        ${tags ? `<div class="shop-info">🔖 ${tags}</div>` : ''}
+        <div class="shop-actions">
+          <button class="btn-edit" onclick="editShop('${shop.id}')">✏️ 編集</button>
+          <button class="btn-delete" onclick="deleteShop('${shop.id}')">🗑️ 削除</button>
+        </div>
+      </div>
+    `;
+  });
+  
+  gridDiv.innerHTML = html;
+}
+
+// 新規店舗追加
+function addShop() {
+  const name = document.getElementById('add-name').value.trim();
+  if (!name) {
+    alert('店舗名を入力してください');
+    return;
+  }
+  
+  const photos = document.getElementById('add-photos').value.trim();
+  const photosArray = photos ? photos.split('\n').map(p => p.trim()).filter(p => p) : [];
+  
+  const shopData = {
+    name: name,
+    short: document.getElementById('add-short').value.trim(),
+    concept: document.getElementById('add-concept').value.trim(),
+    address: document.getElementById('add-address').value.trim(),
+    thumb: document.getElementById('add-thumb').value.trim(),
+    photos: photosArray,
+    links: {
+      site: document.getElementById('add-site').value.trim(),
+      instagram: document.getElementById('add-instagram').value.trim()
+    }
+  };
+  
+  console.log('📤 新規店舗を送信:', shopData);
+  
+  fetch(API_BASE + '/shops', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(shopData)
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(result => {
+    console.log('✅ 新規店舗登録成功:', result);
+    alert('✅ 店舗を登録しました！');
+    
+    // フォームをクリア
+    document.getElementById('add-name').value = '';
+    document.getElementById('add-short').value = '';
+    document.getElementById('add-concept').value = '';
+    document.getElementById('add-address').value = '';
+    document.getElementById('add-thumb').value = '';
+    document.getElementById('add-photos').value = '';
+    document.getElementById('add-site').value = '';
+    document.getElementById('add-instagram').value = '';
+    document.getElementById('thumb-preview').style.display = 'none';
+    
+    loadShops();
+    showSection('list');
+  })
+  .catch(error => {
+    console.error('❌ 新規登録エラー:', error);
+    alert('❌ 登録に失敗しました: ' + error.message);
+  });
+}
+
+// 編集モーダル表示
+function editShop(id) {
+  const shop = shops.find(s => s.id === id);
+  if (!shop) {
+    alert('店舗が見つかりません');
+    return;
+  }
+  
+  console.log('📝 編集開始:', shop);
+  
+  document.getElementById('edit-id').value = shop.id;
+  document.getElementById('edit-name').value = shop.name || '';
+  document.getElementById('edit-short').value = shop.short || '';
+  document.getElementById('edit-concept').value = shop.concept || '';
+  document.getElementById('edit-address').value = shop.address || '';
+  document.getElementById('edit-thumb').value = shop.thumb || '';
+  document.getElementById('edit-photos').value = Array.isArray(shop.photos) ? shop.photos.join('\n') : '';
+  document.getElementById('edit-site').value = shop.links?.site || '';
+  document.getElementById('edit-instagram').value = shop.links?.instagram || '';
+  
+  // プレビュー設定
+  const preview = document.getElementById('edit-thumb-preview');
+  showImagePreview(shop.thumb, preview);
+  
+  document.getElementById('edit-modal').style.display = 'block';
+}
+
+// 店舗更新
+function updateShop() {
+  const id = document.getElementById('edit-id').value;
+  const name = document.getElementById('edit-name').value.trim();
+  
+  if (!name) {
+    alert('店舗名を入力してください');
+    return;
+  }
+  
+  const photos = document.getElementById('edit-photos').value.trim();
+  const photosArray = photos ? photos.split('\n').map(p => p.trim()).filter(p => p) : [];
+  
+  const shopData = {
+    name: name,
+    short: document.getElementById('edit-short').value.trim(),
+    concept: document.getElementById('edit-concept').value.trim(),
+    address: document.getElementById('edit-address').value.trim(),
+    thumb: document.getElementById('edit-thumb').value.trim(),
+    photos: photosArray,
+    links: {
+      site: document.getElementById('edit-site').value.trim(),
+      instagram: document.getElementById('edit-instagram').value.trim()
+    }
+  };
+  
+  console.log('📤 店舗更新を送信:', { id, data: shopData });
+  
+  fetch(API_BASE + '/shops/' + id, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(shopData)
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(result => {
+    console.log('✅ 店舗更新成功:', result);
+    alert('✅ 店舗情報を更新しました！');
+    closeEditModal();
+    loadShops();
+  })
+  .catch(error => {
+    console.error('❌ 更新エラー:', error);
+    alert('❌ 更新に失敗しました: ' + error.message);
+  });
+}
+
+// 店舗削除
+function deleteShop(id) {
+  const shop = shops.find(s => s.id === id);
+  if (!shop) {
+    alert('店舗が見つかりません');
+    return;
+  }
+  
+  if (!confirm(`「${shop.name}」を削除しますか？\nこの操作は取り消せません。`)) {
+    return;
+  }
+  
+  console.log('🗑️ 店舗削除実行:', id);
+  
+  fetch(API_BASE + '/shops/' + id, {
+    method: 'DELETE'
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(result => {
+    console.log('✅ 店舗削除成功:', result);
+    alert('✅ 店舗を削除しました');
+    loadShops();
+  })
+  .catch(error => {
+    console.error('❌ 削除エラー:', error);
+    alert('❌ 削除に失敗しました: ' + error.message);
+  });
+}
+
+// モーダル閉じる
+function closeEditModal() {
+  document.getElementById('edit-modal').style.display = 'none';
+}
+
+// データエクスポート
+function exportData() {
+  const dataStr = JSON.stringify(shops, null, 2);
+  const dataBlob = new Blob([dataStr], {type: 'application/json'});
+  const url = URL.createObjectURL(dataBlob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'gf_shops_' + new Date().toISOString().split('T')[0] + '.json';
+  link.click();
+  URL.revokeObjectURL(url);
+  
+  console.log('💾 データエクスポート完了');
+}
+
+// エラーハンドリング
+window.addEventListener('error', function(e) {
+  console.error('🚨 予期しないエラー:', e.error);
+});
+</script>
+</body>
+</html>
