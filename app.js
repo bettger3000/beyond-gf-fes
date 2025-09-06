@@ -307,8 +307,11 @@ function renderShops(shops) {
 
     // Process shop thumbnail for card display
     let cardImage = 'assets/placeholder.svg';
-    if (shop.thumb && shop.thumb.trim() !== '') {
-      const thumbUrl = convertImagePath(shop.thumb.trim());
+    if (shop.thumb && typeof shop.thumb === 'string' && shop.thumb.trim() !== '') {
+      const trimmedThumb = shop.thumb.trim();
+      console.log('Processing thumb for', shop.name, ':', trimmedThumb);
+      const thumbUrl = convertImagePath(trimmedThumb);
+      console.log('Converted to:', thumbUrl);
       if (thumbUrl && thumbUrl !== 'assets/placeholder.svg') {
         cardImage = thumbUrl;
       }
