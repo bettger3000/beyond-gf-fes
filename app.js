@@ -36,31 +36,114 @@ function convertImagePath(imagePath) {
 
 async function init() {
   try {
-    // First try to load from local storage (管理システムで更新されたデータ)
-    const localShops = localStorage.getItem('completeShops');
-    if (localShops) {
-      state.shops = JSON.parse(localShops);
-      console.log('Loaded shops from local storage:', state.shops.length, 'shops');
-    } else {
-      // Fallback to Cloudflare Workers API
-      let response = await fetch('https://gf-fes-api.bettger1000.workers.dev/api/shops');
-      if (!response.ok) {
-        // Fallback to local file for development
-        response = await fetch('shops.json');
-      }
-      
-      if (!response.ok) throw new Error('Failed to fetch shops data');
-      state.shops = await response.json();
-      console.log('Loaded shops from API:', state.shops.length, 'shops');
-    }
-    
+    await loadShopsData();
     setupFilters();
     renderShops(state.shops);
     setupEventListeners();
     setupScrollEffects();
+    setupStorageListener();
   } catch (error) {
     console.error('Failed to load shops data:', error);
   }
+}
+
+async function loadShopsData() {
+  // First try to load from local storage (管理システムで更新されたデータ)
+  const localShops = localStorage.getItem('completeShops');
+  if (localShops) {
+    state.shops = JSON.parse(localShops);
+    console.log('Loaded shops from local storage:', state.shops.length, 'shops');
+  } else {
+    // Fallback to Cloudflare Workers API
+    let response = await fetch('https://gf-fes-api.bettger1000.workers.dev/api/shops');
+    if (!response.ok) {
+      // Fallback to local file for development
+      response = await fetch('shops.json');
+    }
+    
+    if (!response.ok) throw new Error('Failed to fetch shops data');
+    state.shops = await response.json();
+    console.log('Loaded shops from API:', state.shops.length, 'shops');
+  }
+}
+
+function setupStorageListener() {
+  // Listen for localStorage changes from admin panel
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'completeShops' && e.newValue) {
+      console.log('Detected admin panel update, refreshing shops data...');
+      try {
+        state.shops = JSON.parse(e.newValue);
+        setupFilters();
+        renderShops(state.shops);
+        
+        // Show notification to user
+        showUpdateNotification();
+      } catch (error) {
+        console.error('Error updating shops from storage event:', error);
+      }
+    }
+  });
+  
+  // Also check periodically for same-tab updates (when admin panel is in iframe, etc.)
+  let lastDataHash = getDataHash();
+  setInterval(async () => {
+    const currentDataHash = getDataHash();
+    if (currentDataHash !== lastDataHash) {
+      console.log('Detected local data change, refreshing...');
+      await loadShopsData();
+      setupFilters();
+      renderShops(state.shops);
+      lastDataHash = currentDataHash;
+      showUpdateNotification();
+    }
+  }, 2000); // Check every 2 seconds
+}
+
+function getDataHash() {
+  const data = localStorage.getItem('completeShops');
+  return data ? btoa(data).substring(0, 20) : '';
+}
+
+function showUpdateNotification() {
+  // Create a subtle notification
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: linear-gradient(135deg, #4A5D4F, #5a6d5f);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(74, 93, 79, 0.3);
+    z-index: 1001;
+    opacity: 0;
+    transform: translateX(100px);
+    transition: all 0.3s ease;
+  `;
+  notification.textContent = '✨ 店舗情報が更新されました';
+  
+  document.body.appendChild(notification);
+  
+  // Animate in
+  setTimeout(() => {
+    notification.style.opacity = '1';
+    notification.style.transform = 'translateX(0)';
+  }, 100);
+  
+  // Remove after 3 seconds
+  setTimeout(() => {
+    notification.style.opacity = '0';
+    notification.style.transform = 'translateX(100px)';
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
+      }
+    }, 300);
+  }, 3000);
 }
 
 function setupFilters() {
