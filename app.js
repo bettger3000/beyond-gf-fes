@@ -305,12 +305,22 @@ function renderShops(shops) {
       }
     }
 
+    // Process shop thumbnail for card display
+    let cardImage = 'assets/placeholder.svg';
+    if (shop.thumb && shop.thumb.trim() !== '') {
+      const thumbUrl = convertImagePath(shop.thumb.trim());
+      if (thumbUrl && thumbUrl !== 'assets/placeholder.svg') {
+        cardImage = thumbUrl;
+      }
+    }
+    
     return `
       <div class="shop-card" data-shop-id="${shop.id}">
         <div class="shop-card-image">
-          <img src="${convertImagePath(shop.thumb) || 'assets/placeholder.svg'}" 
+          <img src="${cardImage}" 
                alt="${shop.name}" 
-               loading="lazy">
+               loading="lazy"
+               onerror="this.src='assets/placeholder.svg'">
         </div>
         <div class="shop-card-body">
           ${categoryDisplay}
@@ -337,19 +347,45 @@ function openModal(shopId) {
   
   // Create all available images array (thumb + photos)
   const allImages = [];
-  if (shop.thumb && shop.thumb !== 'assets/placeholder.svg') {
-    allImages.push(convertImagePath(shop.thumb));
+  
+  // Process thumbnail image
+  if (shop.thumb && shop.thumb.trim() !== '' && shop.thumb !== 'assets/placeholder.svg') {
+    const thumbUrl = convertImagePath(shop.thumb.trim());
+    if (thumbUrl && thumbUrl !== 'assets/placeholder.svg') {
+      allImages.push(thumbUrl);
+    }
   }
-  if (shop.photos) {
+  
+  // Process additional photos
+  if (shop.photos && shop.photos.trim() !== '') {
     if (typeof shop.photos === 'string') {
-      const photos = shop.photos.split('\n').filter(photo => photo.trim() && photo.trim() !== 'assets/placeholder.svg');
-      allImages.push(...photos.map(photo => convertImagePath(photo.trim())));
+      // Split by newline and filter valid URLs
+      const photos = shop.photos.split('\n')
+        .map(photo => photo.trim())
+        .filter(photo => {
+          return photo && 
+                 photo !== '' && 
+                 photo !== 'assets/placeholder.svg' &&
+                 (photo.startsWith('http') || photo.startsWith('data:') || photo.includes('.'));
+        });
+      allImages.push(...photos.map(photo => convertImagePath(photo)));
     } else if (Array.isArray(shop.photos)) {
-      allImages.push(...shop.photos.filter(photo => photo && photo !== 'assets/placeholder.svg').map(photo => convertImagePath(photo)));
+      allImages.push(...shop.photos
+        .filter(photo => photo && photo !== 'assets/placeholder.svg')
+        .map(photo => convertImagePath(photo)));
     }
   }
   
   const mainPhoto = allImages[0] || convertImagePath(shop.thumb) || 'assets/placeholder.svg';
+  
+  // Debug image data
+  console.log('Shop data:', {
+    name: shop.name,
+    thumb: shop.thumb,
+    photos: shop.photos,
+    allImages: allImages,
+    mainPhoto: mainPhoto
+  });
   
   modalBody.innerHTML = `
     <div class="modal-header">
