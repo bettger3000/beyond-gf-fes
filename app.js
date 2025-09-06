@@ -9,7 +9,7 @@ const state = {
   currentImageIndex: 0
 };
 
-// Convert image paths to R2 bucket URLs via Worker API
+// Convert image paths - prioritize actual URLs, fallback to placeholder
 function convertImagePath(imagePath) {
   if (!imagePath || imagePath === 'assets/placeholder.svg') {
     return 'assets/placeholder.svg';
@@ -20,14 +20,18 @@ function convertImagePath(imagePath) {
     return imagePath;
   }
   
-  // Convert to R2 API URL for all images (only for relative paths)
+  // For relative paths that look like actual image files
   if (imagePath.endsWith('.svg') || imagePath.endsWith('.png') || 
       imagePath.endsWith('.jpg') || imagePath.endsWith('.jpeg') || 
       imagePath.endsWith('.webp')) {
-    return `https://gf-fes-api.bettger1000.workers.dev/api/image/${imagePath}`;
+    // Only use API for known valid image paths, otherwise placeholder
+    if (imagePath.includes('/') || imagePath.match(/^[a-zA-Z0-9_-]+\.(svg|png|jpg|jpeg|webp)$/)) {
+      return `https://gf-fes-api.bettger1000.workers.dev/api/image/${imagePath}`;
+    }
   }
   
-  return imagePath;
+  // Return placeholder for invalid paths
+  return 'assets/placeholder.svg';
 }
 
 async function init() {
