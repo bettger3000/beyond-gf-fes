@@ -1460,42 +1460,133 @@ a:hover {
   
   /* ヒーローセクション */
   .hero {
-    padding-top: 70px;
-    min-height: 60vh;
+    padding-top: 80px;
+    min-height: 75vh;
+    background: linear-gradient(180deg, 
+      rgba(245, 243, 240, 1) 0%, 
+      rgba(244, 237, 228, 0.8) 50%,
+      rgba(245, 243, 240, 1) 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 20%;
+    left: -10%;
+    width: 120%;
+    height: 60%;
+    background: radial-gradient(ellipse at center, 
+      rgba(184, 152, 90, 0.06) 0%, 
+      rgba(184, 152, 90, 0.02) 50%,
+      transparent 70%);
+    pointer-events: none;
   }
   
   .hero-content {
-    padding: var(--spacing-lg) var(--spacing-sm);
+    padding: var(--spacing-xl) var(--spacing-sm);
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+  
+  .hero-logo {
+    margin-bottom: var(--spacing-lg);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.08));
   }
   
   .hero-logo-img {
-    max-width: 240px;
+    max-width: 280px;
     margin: 0 auto;
+    transition: transform 0.3s ease;
+  }
+  
+  .hero-logo-img:hover {
+    transform: scale(1.02);
   }
   
   .hero-date {
-    font-size: 20px;
-    margin: var(--spacing-sm) 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-accent);
+    margin: var(--spacing-md) 0 var(--spacing-sm);
+    letter-spacing: 0.1em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   }
   
   .hero-catch {
-    font-size: 14px;
-    margin-bottom: var(--spacing-lg);
+    font-size: 15px;
+    color: var(--color-text-light);
+    margin-bottom: var(--spacing-xl);
+    font-weight: 400;
+    line-height: 1.6;
+    max-width: 280px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: var(--spacing-xl);
   }
   
   .hero-actions {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--spacing-xs);
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
   }
   
   .btn {
-    width: 100%;
-    text-align: center;
-    padding: 14px 24px;
-    font-size: 14px;
-    border-radius: 25px;
+    padding: 12px 24px;
+    font-size: 13px;
+    border-radius: 30px;
     font-weight: 600;
+    min-width: 140px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+  }
+  
+  .btn--primary {
+    background: linear-gradient(135deg, var(--color-green), #5a6d5f);
+    color: var(--color-white);
+    box-shadow: 0 4px 12px rgba(74, 93, 79, 0.3);
+  }
+  
+  .btn--primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s ease;
+  }
+  
+  .btn--primary:active::before {
+    left: 100%;
+  }
+  
+  .btn--ghost {
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--color-text);
+    border-color: var(--color-line);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+  
+  .btn--ghost:active {
+    background: rgba(244, 237, 228, 0.95);
+    transform: translateY(1px);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  }
+  
+  .btn--primary:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 6px rgba(74, 93, 79, 0.4);
   }
   
   /* セクション */
@@ -1708,6 +1799,38 @@ a:hover {
     padding: 7px 12px;
     border-radius: 18px;
   }
+  
+  .hero {
+    min-height: 70vh;
+    padding-top: 75px;
+  }
+  
+  .hero-content {
+    padding: var(--spacing-lg) var(--spacing-xs);
+  }
+  
+  .hero-logo-img {
+    max-width: 250px;
+  }
+  
+  .hero-date {
+    font-size: 22px;
+  }
+  
+  .hero-catch {
+    font-size: 14px;
+    max-width: 260px;
+  }
+  
+  .btn {
+    min-width: 120px;
+    font-size: 12px;
+    padding: 10px 20px;
+  }
+  
+  .hero-actions {
+    gap: var(--spacing-xs);
+  }
 }
 
 /* 極小画面対応 */
@@ -1720,5 +1843,29 @@ a:hover {
     font-size: 10px;
     padding: 6px 10px;
     border-radius: 16px;
+  }
+  
+  .hero-logo-img {
+    max-width: 220px;
+  }
+  
+  .hero-date {
+    font-size: 20px;
+  }
+  
+  .hero-catch {
+    font-size: 13px;
+    max-width: 240px;
+  }
+  
+  .btn {
+    min-width: 100px;
+    font-size: 11px;
+    padding: 9px 16px;
+  }
+  
+  .hero-actions {
+    flex-direction: column;
+    gap: 8px;
   }
 }
