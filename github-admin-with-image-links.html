@@ -87,9 +87,9 @@ body { font-family: 'Hiragino Sans', 'Yu Gothic', Arial, sans-serif; background:
   
   <div class="nav">
     <button class="btn btn-primary" onclick="showSection('list')">📋 店舗一覧</button>
-    <button class="btn btn-add" onclick="showSection('add')">➕ 新規登録</button>
+    <button class="btn btn-add" onclick="alert('⚠️ 現在編集機能は準備中です。閲覧のみ可能です。')" style="background:#999;">➕ 新規登録（準備中）</button>
     <button class="btn btn-images" onclick="showSection('images')">📷 画像リンク集</button>
-    <button class="btn btn-import" onclick="document.getElementById('import-file').click()">📥 データインポート</button>
+    <button class="btn btn-import" onclick="alert('⚠️ 現在編集機能は準備中です。閲覧のみ可能です。')" style="background:#999;">📥 データインポート（準備中）</button>
     <button class="btn btn-export" onclick="exportData()">💾 データエクスポート</button>
     <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(event)">
   </div>
@@ -793,8 +793,8 @@ function displayShops() {
         ${shop.category && shop.category.length ? `<div class="shop-info">🏷️ ${shop.category.join(', ')}</div>` : ''}
         ${shop.tags && shop.tags.length ? `<div class="shop-info">🔖 ${shop.tags.join(', ')}</div>` : ''}
         <div class="shop-actions">
-          <button class="btn-edit" onclick="editShop('${shop.id}')">✏️ 編集</button>
-          <button class="btn-delete" onclick="deleteShop('${shop.id}')">🗑️ 削除</button>
+          <button class="btn-edit" onclick="alert('⚠️ 現在編集機能は準備中です。閲覧のみ可能です。')" style="background:#999;">✏️ 編集（準備中）</button>
+          <button class="btn-delete" onclick="alert('⚠️ 現在編集機能は準備中です。閲覧のみ可能です。')" style="background:#999;">🗑️ 削除（準備中）</button>
         </div>
       </div>
     `;
