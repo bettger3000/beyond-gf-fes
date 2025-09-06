@@ -32,15 +32,23 @@ function convertImagePath(imagePath) {
 
 async function init() {
   try {
-    // Load from Cloudflare Workers API
-    let response = await fetch('https://gf-fes-api.bettger1000.workers.dev/api/shops');
-    if (!response.ok) {
-      // Fallback to local file for development
-      response = await fetch('shops.json');
+    // First try to load from local storage (管理システムで更新されたデータ)
+    const localShops = localStorage.getItem('completeShops');
+    if (localShops) {
+      state.shops = JSON.parse(localShops);
+      console.log('Loaded shops from local storage:', state.shops.length, 'shops');
+    } else {
+      // Fallback to Cloudflare Workers API
+      let response = await fetch('https://gf-fes-api.bettger1000.workers.dev/api/shops');
+      if (!response.ok) {
+        // Fallback to local file for development
+        response = await fetch('shops.json');
+      }
+      
+      if (!response.ok) throw new Error('Failed to fetch shops data');
+      state.shops = await response.json();
+      console.log('Loaded shops from API:', state.shops.length, 'shops');
     }
-    
-    if (!response.ok) throw new Error('Failed to fetch shops data');
-    state.shops = await response.json();
     
     setupFilters();
     renderShops(state.shops);
@@ -56,8 +64,22 @@ function setupFilters() {
   const tags = new Set();
   
   state.shops.forEach(shop => {
-    shop.category?.forEach(cat => categories.add(cat));
-    shop.tags?.forEach(tag => tags.add(tag));
+    // 管理システムのデータ形式（文字列）とAPI形式（配列）の両方に対応
+    if (shop.category) {
+      if (typeof shop.category === 'string') {
+        shop.category.split(',').forEach(cat => categories.add(cat.trim()));
+      } else if (Array.isArray(shop.category)) {
+        shop.category.forEach(cat => categories.add(cat));
+      }
+    }
+    
+    if (shop.tags) {
+      if (typeof shop.tags === 'string') {
+        shop.tags.split(',').forEach(tag => tags.add(tag.trim()));
+      } else if (Array.isArray(shop.tags)) {
+        shop.tags.forEach(tag => tags.add(tag));
+      }
+    }
   });
   
   renderFilterButtons('category-filters', Array.from(categories), 'category');
@@ -79,15 +101,33 @@ function applyFilters() {
   let filteredShops = state.shops;
   
   if (state.filters.categories.length > 0) {
-    filteredShops = filteredShops.filter(shop => 
-      shop.category?.some(cat => state.filters.categories.includes(cat))
-    );
+    filteredShops = filteredShops.filter(shop => {
+      if (!shop.category) return false;
+      
+      let categories = [];
+      if (typeof shop.category === 'string') {
+        categories = shop.category.split(',').map(cat => cat.trim());
+      } else if (Array.isArray(shop.category)) {
+        categories = shop.category;
+      }
+      
+      return categories.some(cat => state.filters.categories.includes(cat));
+    });
   }
   
   if (state.filters.tags.length > 0) {
-    filteredShops = filteredShops.filter(shop => 
-      shop.tags?.some(tag => state.filters.tags.includes(tag))
-    );
+    filteredShops = filteredShops.filter(shop => {
+      if (!shop.tags) return false;
+      
+      let tags = [];
+      if (typeof shop.tags === 'string') {
+        tags = shop.tags.split(',').map(tag => tag.trim());
+      } else if (Array.isArray(shop.tags)) {
+        tags = shop.tags;
+      }
+      
+      return tags.some(tag => state.filters.tags.includes(tag));
+    });
   }
   
   renderShops(filteredShops);
@@ -107,27 +147,57 @@ function renderShops(shops) {
   
   if (noResults) noResults.style.display = 'none';
   
-  grid.innerHTML = shops.map(shop => `
-    <div class="shop-card" data-shop-id="${shop.id}">
-      <div class="shop-card-image">
-        <img src="${convertImagePath(shop.thumb) || 'assets/placeholder.svg'}" 
-             alt="${shop.name}" 
-             loading="lazy">
-      </div>
-      <div class="shop-card-body">
-        ${shop.category ? `<span class="shop-card-category">${shop.category[0]}</span>` : ''}
-        <h3 class="shop-card-title">${shop.name}</h3>
-        <p class="shop-card-desc">${shop.short}</p>
-        ${shop.tags ? `
+  grid.innerHTML = shops.map(shop => {
+    // カテゴリの処理
+    let categoryDisplay = '';
+    if (shop.category) {
+      let categories = [];
+      if (typeof shop.category === 'string') {
+        categories = shop.category.split(',').map(cat => cat.trim());
+      } else if (Array.isArray(shop.category)) {
+        categories = shop.category;
+      }
+      if (categories.length > 0) {
+        categoryDisplay = `<span class="shop-card-category">${categories[0]}</span>`;
+      }
+    }
+
+    // タグの処理
+    let tagsDisplay = '';
+    if (shop.tags) {
+      let tags = [];
+      if (typeof shop.tags === 'string') {
+        tags = shop.tags.split(',').map(tag => tag.trim());
+      } else if (Array.isArray(shop.tags)) {
+        tags = shop.tags;
+      }
+      if (tags.length > 0) {
+        tagsDisplay = `
           <div class="shop-card-tags">
-            ${shop.tags.slice(0, 3).map(tag => 
+            ${tags.slice(0, 3).map(tag => 
               `<span class="shop-card-tag">${tag}</span>`
             ).join('')}
           </div>
-        ` : ''}
+        `;
+      }
+    }
+
+    return `
+      <div class="shop-card" data-shop-id="${shop.id}">
+        <div class="shop-card-image">
+          <img src="${convertImagePath(shop.thumb) || 'assets/placeholder.svg'}" 
+               alt="${shop.name}" 
+               loading="lazy">
+        </div>
+        <div class="shop-card-body">
+          ${categoryDisplay}
+          <h3 class="shop-card-title">${shop.name}</h3>
+          <p class="shop-card-desc">${shop.short}</p>
+          ${tagsDisplay}
+        </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 // renderPickupShops function removed - all shops now shown in main grid
