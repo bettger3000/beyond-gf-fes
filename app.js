@@ -203,7 +203,7 @@ function renderShops(shops) {
 // renderPickupShops function removed - all shops now shown in main grid
 
 function openModal(shopId) {
-  const shop = state.shops.find(s => s.id === shopId);
+  const shop = state.shops.find(s => s.id == shopId);
   if (!shop) return;
   
   state.currentModalShop = shop;
