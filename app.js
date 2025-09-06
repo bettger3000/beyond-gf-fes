@@ -207,8 +207,14 @@ function renderShops(shops) {
 // renderPickupShops function removed - all shops now shown in main grid
 
 function openModal(shopId) {
+  console.log('openModal called with:', shopId);
+  console.log('Available shops:', state.shops.map(s => ({ id: s.id, name: s.name })));
   const shop = state.shops.find(s => s.id == shopId);
-  if (!shop) return;
+  if (!shop) {
+    console.error('Shop not found for ID:', shopId);
+    return;
+  }
+  console.log('Found shop:', shop.name);
   
   state.currentModalShop = shop;
   const modal = document.getElementById('modal');
@@ -528,6 +534,7 @@ function setupEventListeners() {
     
     if (e.target.closest('.shop-card')) {
       const shopId = e.target.closest('.shop-card').dataset.shopId;
+      console.log('Shop clicked, ID:', shopId);
       openModal(shopId);
     }
     
