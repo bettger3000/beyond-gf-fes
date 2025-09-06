@@ -15,12 +15,12 @@ function convertImagePath(imagePath) {
     return 'assets/placeholder.svg';
   }
   
-  // If already a full URL, return as is
-  if (imagePath.startsWith('http')) {
+  // If already a full URL (including data URLs from management system), return as is
+  if (imagePath.startsWith('http') || imagePath.startsWith('data:')) {
     return imagePath;
   }
   
-  // Convert to R2 API URL for all images
+  // Convert to R2 API URL for all images (only for relative paths)
   if (imagePath.endsWith('.svg') || imagePath.endsWith('.png') || 
       imagePath.endsWith('.jpg') || imagePath.endsWith('.jpeg') || 
       imagePath.endsWith('.webp')) {
