@@ -239,11 +239,11 @@ function openModal(shopId) {
           <img src="${mainPhoto}" alt="${shop.name}" id="modal-main-image">
           ${allImages.length > 1 ? `
             <div class="modal-image-nav">
-              <button class="modal-nav-btn prev" onclick="navigateModalImage(-1)" aria-label="前の画像">‹</button>
+              <button class="modal-nav-btn prev" id="modal-nav-prev" aria-label="前の画像">‹</button>
               <span class="modal-image-counter">
                 <span id="modal-current-image">1</span> / ${allImages.length}
               </span>
-              <button class="modal-nav-btn next" onclick="navigateModalImage(1)" aria-label="次の画像">›</button>
+              <button class="modal-nav-btn next" id="modal-nav-next" aria-label="次の画像">›</button>
             </div>
           ` : ''}
         </div>
@@ -423,8 +423,18 @@ function closeModal() {
 function setupModalImageSwitcher() {
   const thumbs = document.querySelectorAll('.modal-image-thumb');
   const mainImage = document.getElementById('modal-main-image');
+  const prevBtn = document.getElementById('modal-nav-prev');
+  const nextBtn = document.getElementById('modal-nav-next');
   
   if (!mainImage || thumbs.length === 0) return;
+  
+  // ナビゲーションボタンのイベントリスナー
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => navigateModalImage(-1));
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => navigateModalImage(1));
+  }
   
   thumbs.forEach(thumb => {
     thumb.addEventListener('click', () => {
@@ -437,18 +447,21 @@ function setupModalImageSwitcher() {
   });
 
   // Store image data in state for navigation
-  if (!state.currentModalImages) {
-    const shop = state.currentModalShop;
-    if (shop) {
-      state.currentModalImages = [];
-      if (shop.thumb && shop.thumb !== 'assets/placeholder.svg') {
-        state.currentModalImages.push(shop.thumb);
-      }
-      if (shop.photos && Array.isArray(shop.photos)) {
-        state.currentModalImages.push(...shop.photos.filter(photo => photo && photo !== 'assets/placeholder.svg'));
-      }
-      state.currentImageIndex = 0;
+  const shop = state.currentModalShop;
+  if (shop) {
+    state.currentModalImages = [];
+    if (shop.thumb && shop.thumb !== 'assets/placeholder.svg') {
+      state.currentModalImages.push(convertImagePath(shop.thumb));
     }
+    if (shop.photos) {
+      if (typeof shop.photos === 'string') {
+        const photos = shop.photos.split('\n').filter(photo => photo.trim() && photo.trim() !== 'assets/placeholder.svg');
+        state.currentModalImages.push(...photos.map(photo => convertImagePath(photo.trim())));
+      } else if (Array.isArray(shop.photos)) {
+        state.currentModalImages.push(...shop.photos.filter(photo => photo && photo !== 'assets/placeholder.svg').map(photo => convertImagePath(photo)));
+      }
+    }
+    state.currentImageIndex = 0;
   }
 }
 
