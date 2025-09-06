@@ -1386,18 +1386,23 @@ a:hover {
     padding: 0 var(--spacing-sm);
   }
   
-  /* ヘッダー改善 */
+  /* ヘッダー改善 - より洗練されたデザイン */
   .site-header {
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.95);
-    border-bottom: 1px solid rgba(232, 224, 214, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.98);
+    border-bottom: 1px solid rgba(232, 224, 214, 0.3);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.04);
+    padding: 12px 0;
   }
   
   .nav-container {
-    padding: 10px var(--spacing-sm);
+    padding: 0 var(--spacing-md);
     justify-content: center;
     position: relative;
+    height: 60px;
+    display: flex;
+    align-items: center;
   }
   
   .logo {
@@ -1406,14 +1411,15 @@ a:hover {
   
   .nav-menu {
     display: flex;
-    gap: 6px;
+    gap: 10px;
     flex-wrap: nowrap;
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    padding: 0 8px;
+    padding: 0 12px;
     max-width: 100%;
     justify-content: center;
+    align-items: center;
   }
   
   .nav-menu::-webkit-scrollbar {
@@ -1421,19 +1427,20 @@ a:hover {
   }
   
   .nav-menu a {
-    font-size: 12px;
-    padding: 8px 16px;
-    border-radius: 20px;
-    transition: all 0.3s ease;
+    font-size: 13px;
+    padding: 12px 18px;
+    border-radius: 25px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     white-space: nowrap;
     flex-shrink: 0;
     font-weight: 600;
-    background: linear-gradient(135deg, var(--color-warm), #f0ebe3);
+    background: linear-gradient(135deg, rgba(244, 237, 228, 0.9), rgba(240, 235, 227, 0.9));
     color: var(--color-text);
-    border: 1px solid var(--color-line);
+    border: 1px solid rgba(232, 224, 214, 0.5);
     position: relative;
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    letter-spacing: 0.02em;
   }
   
   .nav-menu a::before {
@@ -1443,8 +1450,22 @@ a:hover {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-    transition: left 0.5s ease;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+    transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .nav-menu a:hover,
+  .nav-menu a:focus {
+    background: linear-gradient(135deg, var(--color-green), #3a4d3f);
+    color: var(--color-white);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(74, 93, 79, 0.25);
+    border-color: var(--color-green);
+  }
+  
+  .nav-menu a:hover::before,
+  .nav-menu a:focus::before {
+    left: 100%;
   }
   
   .nav-menu a:active {
