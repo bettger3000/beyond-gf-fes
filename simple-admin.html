@@ -171,7 +171,126 @@
   </div>
   
   <script>
-    let shops = JSON.parse(localStorage.getItem('shops') || '[]');
+    // 既存データを初期データとして設定
+    const initialData = [
+      {
+        "id": 1,
+        "name": "とまり來",
+        "category": "スイーツ",
+        "tags": "小麦不使用,ナッツ不使用,専用調理場",
+        "short": "米粉ケーキとスペシャリティコーヒーの専門店",
+        "concept": "『からだにやさしい』『こころにあたたかい』食を通じて集う場所",
+        "address": "豊明市沓掛町",
+        "website": "",
+        "instagram": "https://instagram.com/tomarigi_tyak"
+      },
+      {
+        "id": 2,
+        "name": "どらカフェ三幸",
+        "category": "スイーツ",
+        "tags": "小麦不使用,専用調理場",
+        "short": "グルテンフリーのふわっもちっどらやき専門店",
+        "concept": "「福」が「来」るどらやき",
+        "address": "愛知県小牧市",
+        "website": "",
+        "instagram": "https://instagram.com/doracafe_sanko"
+      },
+      {
+        "id": 3,
+        "name": "rucipio",
+        "category": "スイーツ",
+        "tags": "小麦不使用,卵不使用,白砂糖不使用",
+        "short": "豆腐と米粉のヘルシーマフィン専門店",
+        "concept": "からだにも心にもやさしい、幸せなおやつ時間を届けたい",
+        "address": "岐阜県恵那市",
+        "website": "",
+        "instagram": "https://instagram.com/rucipio"
+      },
+      {
+        "id": 4,
+        "name": "くまさん家。のこめこぱん",
+        "category": "パン",
+        "tags": "小麦不使用,乳不使用,砂糖不使用,美腸活",
+        "short": "食べてキレイを叶える美腸活米粉パン",
+        "concept": "食べてキレイを叶える美腸活米粉パン",
+        "address": "名古屋市南区",
+        "website": "",
+        "instagram": "https://instagram.com/kumano_hakkousyoku"
+      },
+      {
+        "id": 5,
+        "name": "2525sweets",
+        "category": "スイーツ",
+        "tags": "8大アレルゲン不使用,専用調理場",
+        "short": "8大アレルゲン不使用の米粉フィナンシェ専門店",
+        "concept": "アレルギーのある人もない人もみんな一緒に美味しく楽しいお菓子の時間を♪",
+        "address": "愛知県名古屋市中区",
+        "website": "",
+        "instagram": "https://instagram.com/2525sweets"
+      },
+      {
+        "id": 6,
+        "name": "菜食食堂ととと",
+        "category": "食事",
+        "tags": "動物性不使用,有機野菜,八大アレルゲン不使用",
+        "short": "動物性不使用の大判型グルテンフリーお好み焼き",
+        "concept": "野菜だけでも「ちゃんと美味しい！」を届けたい",
+        "address": "露店営業のみのため店舗はありません。",
+        "website": "",
+        "instagram": "https://instagram.com/tototo.saishok"
+      },
+      {
+        "id": 7,
+        "name": "米粉パンケーキ sora 1-na cafe",
+        "category": "スイーツ",
+        "tags": "小麦不使用,国産米粉100%,専用調理場",
+        "short": "ふわふわ米粉パンケーキのキッチンカー",
+        "concept": "小麦アレルギーのある方も、そうでない方も、同じおやつを囲んで一緒に笑顔になってほしい。",
+        "address": "名古屋市港区",
+        "website": "",
+        "instagram": "https://instagram.com/sora_1na_cafe"
+      },
+      {
+        "id": 8,
+        "name": "米粉のおやつ ココカラ日和",
+        "category": "スイーツ",
+        "tags": "小麦不使用,たまご不使用,無農薬米粉",
+        "short": "無農薬米粉を使った身体に優しい焼き菓子",
+        "concept": "",
+        "address": "愛知県知多郡阿久比町",
+        "website": "",
+        "instagram": "https://instagram.com/cocokara_biyori"
+      },
+      {
+        "id": 9,
+        "name": "やさしいスイーツカフェ corpo",
+        "category": "カフェ",
+        "tags": "グルテンフリー,専用調理場,白砂糖不使用",
+        "short": "グルテンフリーカフェ・創業9周年",
+        "concept": "グルテンフリーのカフェ アレルギーがあってもなくても、同じテーブルで安心してお食事やデザートが食べられる空間、場所を提供します",
+        "address": "愛知県名古屋市中川区",
+        "website": "",
+        "instagram": "https://instagram.com/corpo_pr"
+      },
+      {
+        "id": 10,
+        "name": "bagel haruhana",
+        "category": "パン",
+        "tags": "小麦不使用,卵不使用,乳不使用,専用調理場",
+        "short": "グルテンフリー米粉ベーグル専門店",
+        "concept": "アレルギーがあってもなくてもみんなで同じ食卓を囲める幸せがふえますように",
+        "address": "名古屋市千種区",
+        "website": "",
+        "instagram": "https://instagram.com/bagel_haruhana"
+      }
+    ];
+
+    // 既存データがない場合は初期データを使用
+    let shops = JSON.parse(localStorage.getItem('shops') || 'null');
+    if (!shops || shops.length === 0) {
+      shops = initialData;
+      localStorage.setItem('shops', JSON.stringify(shops));
+    }
     
     // 初期化
     window.onload = function() {
