@@ -11,12 +11,17 @@ const state = {
 
 // Convert image paths - prioritize actual URLs, fallback to placeholder
 function convertImagePath(imagePath) {
+  console.log('=== convertImagePath called ===');
+  console.log('Input:', imagePath);
+  
   if (!imagePath || imagePath === 'assets/placeholder.svg') {
+    console.log('Result: placeholder (empty or already placeholder)');
     return 'assets/placeholder.svg';
   }
   
   // If already a full URL (including data URLs from management system), return as is
   if (imagePath.startsWith('http') || imagePath.startsWith('data:')) {
+    console.log('Result: full URL returned as-is:', imagePath);
     return imagePath;
   }
   
@@ -26,11 +31,14 @@ function convertImagePath(imagePath) {
       imagePath.endsWith('.webp')) {
     // Only use API for known valid image paths, otherwise placeholder
     if (imagePath.includes('/') || imagePath.match(/^[a-zA-Z0-9_-]+\.(svg|png|jpg|jpeg|webp)$/)) {
-      return `https://gf-fes-api.bettger1000.workers.dev/api/image/${imagePath}`;
+      const apiUrl = `https://gf-fes-api.bettger1000.workers.dev/api/image/${imagePath}`;
+      console.log('Result: API URL:', apiUrl);
+      return apiUrl;
     }
   }
   
   // Return placeholder for invalid paths
+  console.log('Result: placeholder (invalid path)');
   return 'assets/placeholder.svg';
 }
 
@@ -66,12 +74,25 @@ async function init() {
 }
 
 async function loadShopsData() {
+  console.log('=== loadShopsData called ===');
+  
   // First try to load from local storage (管理システムで更新されたデータ)
   const localShops = localStorage.getItem('completeShops');
   if (localShops) {
     state.shops = JSON.parse(localShops);
     console.log('Loaded shops from local storage:', state.shops.length, 'shops');
+    
+    // Debug: Show first few shops with their thumb data
+    state.shops.slice(0, 3).forEach((shop, index) => {
+      console.log(`Shop ${index + 1} (${shop.name}):`, {
+        id: shop.id,
+        thumb: shop.thumb,
+        photos: shop.photos
+      });
+    });
   } else {
+    console.log('No local storage data found, falling back to API');
+    
     // Fallback to Cloudflare Workers API
     let response = await fetch('https://gf-fes-api.bettger1000.workers.dev/api/shops');
     if (!response.ok) {
