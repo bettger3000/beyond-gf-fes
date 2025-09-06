@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>店舗管理システム - シンプル版</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+    .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    h1 { color: #2c5f2d; margin-bottom: 30px; text-align: center; }
+    .nav { display: flex; gap: 10px; margin-bottom: 30px; }
+    .btn { background: #2c5f2d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+    .btn:hover { background: #1a3a1b; }
+    .btn-add { background: #007bff; }
+    .btn-export { background: #28a745; }
+    .section { display: none; }
+    .section.active { display: block; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-weight: bold; margin-bottom: 5px; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+    .form-group textarea { height: 80px; resize: vertical; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .shops-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+    .shop-card { border: 1px solid #ddd; border-radius: 8px; padding: 20px; background: white; }
+    .shop-card h3 { color: #2c5f2d; margin-bottom: 10px; }
+    .shop-actions { margin-top: 15px; }
+    .btn-edit { background: #007bff; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin-right: 5px; }
+    .btn-delete { background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+    .modal-content { background: white; width: 90%; max-width: 600px; margin: 50px auto; padding: 30px; border-radius: 10px; max-height: 80vh; overflow-y: auto; }
+    .modal-close { float: right; font-size: 24px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🍞 店舗管理システム</h1>
+    
+    <div class="nav">
+      <button class="btn" onclick="showSection('list')">📋 店舗一覧</button>
+      <button class="btn btn-add" onclick="showSection('add')">➕ 新規登録</button>
+      <button class="btn btn-export" onclick="exportData()">💾 エクスポート</button>
+    </div>
+    
+    <!-- 店舗一覧 -->
+    <div id="section-list" class="section active">
+      <h2>店舗一覧</h2>
+      <div id="shops-grid" class="shops-grid"></div>
+    </div>
+    
+    <!-- 新規登録 -->
+    <div id="section-add" class="section">
+      <h2>新規店舗登録</h2>
+      <form id="add-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>店舗名 *</label>
+            <input type="text" id="add-name" required>
+          </div>
+          <div class="form-group">
+            <label>簡潔な説明</label>
+            <input type="text" id="add-short">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>コンセプト</label>
+          <textarea id="add-concept"></textarea>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>カテゴリ</label>
+            <select id="add-category">
+              <option value="">選択してください</option>
+              <option value="スイーツ">スイーツ</option>
+              <option value="パン">パン</option>
+              <option value="食事">食事</option>
+              <option value="ドリンク">ドリンク</option>
+              <option value="カフェ">カフェ</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>タグ</label>
+            <input type="text" id="add-tags" placeholder="カンマ区切りで入力">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>住所</label>
+          <input type="text" id="add-address">
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>ウェブサイト</label>
+            <input type="url" id="add-website">
+          </div>
+          <div class="form-group">
+            <label>Instagram</label>
+            <input type="url" id="add-instagram">
+          </div>
+        </div>
+        
+        <button type="submit" class="btn">💾 登録する</button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- 編集モーダル -->
+  <div id="edit-modal" class="modal">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeEditModal()">&times;</span>
+      <h2>店舗編集</h2>
+      <form id="edit-form">
+        <input type="hidden" id="edit-id">
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>店舗名 *</label>
+            <input type="text" id="edit-name" required>
+          </div>
+          <div class="form-group">
+            <label>簡潔な説明</label>
+            <input type="text" id="edit-short">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>コンセプト</label>
+          <textarea id="edit-concept"></textarea>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>カテゴリ</label>
+            <select id="edit-category">
+              <option value="">選択してください</option>
+              <option value="スイーツ">スイーツ</option>
+              <option value="パン">パン</option>
+              <option value="食事">食事</option>
+              <option value="ドリンク">ドリンク</option>
+              <option value="カフェ">カフェ</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>タグ</label>
+            <input type="text" id="edit-tags" placeholder="カンマ区切りで入力">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>住所</label>
+          <input type="text" id="edit-address">
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>ウェブサイト</label>
+            <input type="url" id="edit-website">
+          </div>
+          <div class="form-group">
+            <label>Instagram</label>
+            <input type="url" id="edit-instagram">
+          </div>
+        </div>
+        
+        <button type="submit" class="btn">💾 更新する</button>
+      </form>
+    </div>
+  </div>
+  
+  <script>
+    let shops = JSON.parse(localStorage.getItem('shops') || '[]');
+    
+    // 初期化
+    window.onload = function() {
+      displayShops();
+      
+      document.getElementById('add-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        addShop();
+      });
+      
+      document.getElementById('edit-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        updateShop();
+      });
+    };
+    
+    // セクション表示切り替え
+    function showSection(section) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById('section-' + section).classList.add('active');
+    }
+    
+    // 店舗一覧表示
+    function displayShops() {
+      const grid = document.getElementById('shops-grid');
+      
+      if (shops.length === 0) {
+        grid.innerHTML = '<p>まだ店舗が登録されていません。</p>';
+        return;
+      }
+      
+      grid.innerHTML = shops.map(shop => `
+        <div class="shop-card">
+          <h3>${shop.name}</h3>
+          <p><strong>カテゴリ:</strong> ${shop.category || '未設定'}</p>
+          <p><strong>簡潔な説明:</strong> ${shop.short || '未設定'}</p>
+          <p><strong>住所:</strong> ${shop.address || '未設定'}</p>
+          ${shop.tags ? `<p><strong>タグ:</strong> ${shop.tags}</p>` : ''}
+          <div class="shop-actions">
+            <button class="btn-edit" onclick="editShop(${shop.id})">✂️ 編集</button>
+            <button class="btn-delete" onclick="deleteShop(${shop.id})">🗑️ 削除</button>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    // 店舗追加
+    function addShop() {
+      const name = document.getElementById('add-name').value.trim();
+      if (!name) {
+        alert('店舗名を入力してください');
+        return;
+      }
+      
+      const shop = {
+        id: Date.now(),
+        name: name,
+        short: document.getElementById('add-short').value.trim(),
+        concept: document.getElementById('add-concept').value.trim(),
+        category: document.getElementById('add-category').value,
+        tags: document.getElementById('add-tags').value.trim(),
+        address: document.getElementById('add-address').value.trim(),
+        website: document.getElementById('add-website').value.trim(),
+        instagram: document.getElementById('add-instagram').value.trim()
+      };
+      
+      shops.push(shop);
+      localStorage.setItem('shops', JSON.stringify(shops));
+      
+      document.getElementById('add-form').reset();
+      displayShops();
+      alert('✅ 店舗を登録しました！');
+      showSection('list');
+    }
+    
+    // 店舗編集
+    function editShop(id) {
+      const shop = shops.find(s => s.id === id);
+      if (!shop) return;
+      
+      document.getElementById('edit-id').value = shop.id;
+      document.getElementById('edit-name').value = shop.name;
+      document.getElementById('edit-short').value = shop.short || '';
+      document.getElementById('edit-concept').value = shop.concept || '';
+      document.getElementById('edit-category').value = shop.category || '';
+      document.getElementById('edit-tags').value = shop.tags || '';
+      document.getElementById('edit-address').value = shop.address || '';
+      document.getElementById('edit-website').value = shop.website || '';
+      document.getElementById('edit-instagram').value = shop.instagram || '';
+      
+      document.getElementById('edit-modal').style.display = 'block';
+    }
+    
+    // 店舗更新
+    function updateShop() {
+      const id = parseInt(document.getElementById('edit-id').value);
+      const name = document.getElementById('edit-name').value.trim();
+      
+      if (!name) {
+        alert('店舗名を入力してください');
+        return;
+      }
+      
+      const shopIndex = shops.findIndex(s => s.id === id);
+      if (shopIndex === -1) return;
+      
+      shops[shopIndex] = {
+        id: id,
+        name: name,
+        short: document.getElementById('edit-short').value.trim(),
+        concept: document.getElementById('edit-concept').value.trim(),
+        category: document.getElementById('edit-category').value,
+        tags: document.getElementById('edit-tags').value.trim(),
+        address: document.getElementById('edit-address').value.trim(),
+        website: document.getElementById('edit-website').value.trim(),
+        instagram: document.getElementById('edit-instagram').value.trim()
+      };
+      
+      localStorage.setItem('shops', JSON.stringify(shops));
+      displayShops();
+      closeEditModal();
+      alert('✅ 店舗情報を更新しました！');
+    }
+    
+    // 店舗削除
+    function deleteShop(id) {
+      const shop = shops.find(s => s.id === id);
+      if (!shop) return;
+      
+      if (!confirm(`「${shop.name}」を削除しますか？`)) return;
+      
+      shops = shops.filter(s => s.id !== id);
+      localStorage.setItem('shops', JSON.stringify(shops));
+      displayShops();
+      alert('✅ 店舗を削除しました！');
+    }
+    
+    // 編集モーダルを閉じる
+    function closeEditModal() {
+      document.getElementById('edit-modal').style.display = 'none';
+    }
+    
+    // データエクスポート
+    function exportData() {
+      if (shops.length === 0) {
+        alert('エクスポートするデータがありません');
+        return;
+      }
+      
+      const jsonStr = JSON.stringify(shops, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'shops-' + new Date().toISOString().slice(0,10) + '.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      alert(`✅ ${shops.length}件のデータをエクスポートしました`);
+    }
+  </script>
+</body>
+</html>
