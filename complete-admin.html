@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>完全版店舗管理システム - 19項目対応</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+    .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    h1 { color: #2c5f2d; margin-bottom: 30px; text-align: center; }
+    .nav { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+    .btn { background: #2c5f2d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+    .btn:hover { background: #1a3a1b; }
+    .btn-add { background: #007bff; }
+    .btn-export { background: #28a745; }
+    .section { display: none; }
+    .section.active { display: block; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-weight: bold; margin-bottom: 5px; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+    .form-group textarea { height: 80px; resize: vertical; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .shops-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+    .shop-card { border: 1px solid #ddd; border-radius: 8px; padding: 20px; background: white; }
+    .shop-card h3 { color: #2c5f2d; margin-bottom: 10px; }
+    .shop-info { margin: 5px 0; color: #666; font-size: 14px; }
+    .shop-actions { margin-top: 15px; }
+    .btn-edit { background: #007bff; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin-right: 5px; }
+    .btn-delete { background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+    .modal-content { background: white; width: 95%; max-width: 800px; margin: 20px auto; padding: 30px; border-radius: 10px; max-height: 90vh; overflow-y: auto; }
+    .modal-close { float: right; font-size: 24px; cursor: pointer; }
+    .long-text { max-height: 60px; overflow: hidden; }
+    .long-text.expanded { max-height: none; }
+    .expand-btn { color: #007bff; cursor: pointer; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🍞 完全版店舗管理システム（19項目対応）</h1>
+    
+    <div class="nav">
+      <button class="btn" onclick="showSection('list')">📋 店舗一覧</button>
+      <button class="btn btn-add" onclick="showSection('add')">➕ 新規登録</button>
+      <button class="btn btn-export" onclick="exportData()">💾 エクスポート</button>
+    </div>
+    
+    <!-- 店舗一覧 -->
+    <div id="section-list" class="section active">
+      <h2>店舗一覧</h2>
+      <div id="shops-grid" class="shops-grid"></div>
+    </div>
+    
+    <!-- 新規登録 -->
+    <div id="section-add" class="section">
+      <h2>新規店舗登録</h2>
+      <form id="add-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>店舗名 *</label>
+            <input type="text" id="add-name" required>
+          </div>
+          <div class="form-group">
+            <label>簡潔な説明</label>
+            <input type="text" id="add-short">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>コンセプト</label>
+          <textarea id="add-concept"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>詳細説明</label>
+          <textarea id="add-desc"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>ターゲット客層</label>
+          <textarea id="add-targetCustomer"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>ストーリー・背景</label>
+          <textarea id="add-story"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>おすすめポイント</label>
+          <textarea id="add-recommendation"></textarea>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>カテゴリ</label>
+            <input type="text" id="add-category" placeholder="例: スイーツ,ドリンク">
+          </div>
+          <div class="form-group">
+            <label>タグ</label>
+            <input type="text" id="add-tags" placeholder="例: 小麦不使用,専用調理場">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>アレルギー情報</label>
+          <textarea id="add-allergyInfo" placeholder="含まれるアレルゲンや注意事項"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>コンタミネーション対応</label>
+          <select id="add-contamination">
+            <option value="">選択してください</option>
+            <option value="① 専用調理場・小麦・麦類を一切持ち込まない専用の調理場で製造">① 専用調理場</option>
+            <option value="③小麦を扱う調理場・普段は小麦製品を扱う環境で製造">③小麦を扱う調理場</option>
+            <option value="④小麦粉は使用していないが、小麦を含む調味料を使用している調理場">④小麦含む調味料使用</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>メニュー（改行区切り）</label>
+          <textarea id="add-menu" placeholder="米粉ケーキ - 500円
+スペシャリティコーヒー - 400円"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label>住所</label>
+          <input type="text" id="add-address">
+        </div>
+
+        <div class="form-group">
+          <label>Google Maps URL</label>
+          <input type="url" id="add-googleMaps">
+        </div>
+
+        <div class="form-group">
+          <label>サムネイル画像</label>
+          <input type="text" id="add-thumb">
+        </div>
+
+        <div class="form-group">
+          <label>追加写真URLs（改行区切り）</label>
+          <textarea id="add-photos"></textarea>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>ウェブサイト</label>
+            <input type="url" id="add-website">
+          </div>
+          <div class="form-group">
+            <label>Instagram</label>
+            <input type="url" id="add-instagram">
+          </div>
+        </div>
+        
+        <button type="submit" class="btn">💾 登録する</button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- 編集モーダル -->
+  <div id="edit-modal" class="modal">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeEditModal()">&times;</span>
+      <h2>店舗編集</h2>
+      <form id="edit-form">
+        <input type="hidden" id="edit-id">
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>店舗名 *</label>
+            <input type="text" id="edit-name" required>
+          </div>
+          <div class="form-group">
+            <label>簡潔な説明</label>
+            <input type="text" id="edit-short">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>コンセプト</label>
+          <textarea id="edit-concept"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>詳細説明</label>
+          <textarea id="edit-desc"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>ターゲット客層</label>
+          <textarea id="edit-targetCustomer"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>ストーリー・背景</label>
+          <textarea id="edit-story"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>おすすめポイント</label>
+          <textarea id="edit-recommendation"></textarea>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>カテゴリ</label>
+            <input type="text" id="edit-category">
+          </div>
+          <div class="form-group">
+            <label>タグ</label>
+            <input type="text" id="edit-tags">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>アレルギー情報</label>
+          <textarea id="edit-allergyInfo"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>コンタミネーション対応</label>
+          <select id="edit-contamination">
+            <option value="">選択してください</option>
+            <option value="① 専用調理場・小麦・麦類を一切持ち込まない専用の調理場で製造">① 専用調理場</option>
+            <option value="③小麦を扱う調理場・普段は小麦製品を扱う環境で製造">③小麦を扱う調理場</option>
+            <option value="④小麦粉は使用していないが、小麦を含む調味料を使用している調理場">④小麦含む調味料使用</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>メニュー（改行区切り）</label>
+          <textarea id="edit-menu"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label>住所</label>
+          <input type="text" id="edit-address">
+        </div>
+
+        <div class="form-group">
+          <label>Google Maps URL</label>
+          <input type="url" id="edit-googleMaps">
+        </div>
+
+        <div class="form-group">
+          <label>サムネイル画像</label>
+          <input type="text" id="edit-thumb">
+        </div>
+
+        <div class="form-group">
+          <label>追加写真URLs</label>
+          <textarea id="edit-photos"></textarea>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>ウェブサイト</label>
+            <input type="url" id="edit-website">
+          </div>
+          <div class="form-group">
+            <label>Instagram</label>
+            <input type="url" id="edit-instagram">
+          </div>
+        </div>
+        
+        <button type="submit" class="btn">💾 更新する</button>
+      </form>
+    </div>
+  </div>
+  
+  <script>
+    // 完全な既存データ（19項目）
+    const initialData = [
+      {"id":1,"name":"とまり來","category":"スイーツ,ドリンク","tags":"小麦不使用,ナッツ不使用,専用調理場","short":"米粉ケーキとスペシャリティコーヒーの専門店","concept":"『からだにやさしい』『こころにあたたかい』食を通じて集う場所","desc":"米粉はもちろん、抹茶、クーベルチュールチョコ、スペシャリティコーヒー豆等、一つ一つの素材にこだわり『からだにやさしい』ケーキをご提供いたします。","targetCustomer":"ご自分を大切にしたい方、身体やこころに優しいお食事がおこのみの方、家族やご友人と健康で豊かな食生活をお望みの方","story":"自身がアレルギー疾患があり、第一子の流産を機に食生活と身体の健康について、人に良いと書いて『食』と学ぶ。現在は、【食】の学びを大切に子育てをし、『夢を叶える子育て』をモットーに大学生3年生と1年生の母親でもあります。子育てを経た2023年12月【食】への学びを活かして『とまり來』をオープン。2025年1月自身が、小麦粉＆ナッツ類のアナフィラキシーショックを発症し『とまり來』も順次グルテンフリーを対応。2025年9月メニューより、グルテンフリー対応する。","recommendation":"小麦粉を気にせずに、安心して食べれるケーキです。アレルギーの方だけでなく、食べ物へのこだわりのある方、ご興味のある方はぜひ召し上がって下さい。","allergyInfo":"ナッツ類","contamination":"① 専用調理場・小麦・麦類を一切持ち込まない専用の調理場で製造","menu":"米粉ケーキ（豆まっちゃチーズ、おとうふショコラちゃん、ふんわりシフォン）\nスペシャリティコーヒー","address":"豊明市沓掛町","googleMaps":"","thumb":"tomarigi.svg","photos":"","website":"","instagram":"https://instagram.com/tomarigi_tyak"},
+      {"id":2,"name":"どらカフェ三幸","category":"和菓子","tags":"小麦不使用,専用調理場","short":"グルテンフリーのふわっもちっどらやき専門店","concept":"「福」が「来」るどらやき","desc":"グルテンフリーのふわっもちっ食感皮にやさしい甘さの自家製あんこをたっぷりはさんだどらやき。専門店ならではのオリジナルどらやきを多数ご用意。","targetCustomer":"アレルギーがある方も、そうでない方も美味しいものを求めている方に","story":"美味しいあんこを作れる機械を見つけた事がきっかけで、どらやきに興味をもち、色んなどらやきを食べ比べはじめました。そんな時に父が小麦粉アレルギーを発症。小麦粉アレルギーがある方は、食べられるどらやきがないほぼ事をその時初めて知り、作ってみることに。試行錯誤の上、今のどらやきが完成しました。","recommendation":"「グルテンフリーだから美味しくないんでしょ。」そんな想いを払拭したい。『どんな方にも美味しいものを』提供できるよう　ひとつひとつ丁寧に毎朝手作りしております。はじめてのビヨンドグルテンフリー祭り、楽しみにしております♪","allergyInfo":"乳製品（製造所内で乳製品使用)","contamination":"① 専用調理場・小麦・麦類を一切持ち込まない専用の調理場で製造","menu":"どらやき\nフィナンシェ","address":"愛知県小牧市","googleMaps":"","thumb":"doracafe.svg","photos":"","website":"","instagram":"https://instagram.com/doracafe_sanko"},
+      {"id":3,"name":"rucipio","category":"スイーツ","tags":"小麦不使用,卵不使用,白砂糖不使用","short":"豆腐と米粉のヘルシーマフィン専門店","concept":"からだにも心にもやさしい、幸せなおやつ時間を届けたい","desc":"豆腐と米粉を主原料に、小麦・卵・白砂糖は不使用のグルテンフリーマフィンです。基本的に乳製品不使用で作られていますが、一部のフレーバーや季節限定商品などで乳製品を含む場合があります。","targetCustomer":"グルテンフリーな方、ヘルシー思考な方、アレルギーをお持ちの方","story":"もともと豆腐マフィンを作っていたのですが、友人からグルテンフリーのマフィンを作って欲しいと言われて、グルテンフリーマフィンに切り替えました。","recommendation":"rucipio（ルキピオ）は、豆腐と米粉を使ったグルテンフリースイーツのお店。卵・乳製品・白砂糖・小麦粉を使わず、ココロとカラダにの優しい「幸せの処方箋」をお届けしています","allergyInfo":"マフィンのベース生地は乳製品、卵は不使用ですが、具材によっては乳製品を使用しています","contamination":"③小麦を扱う調理場・普段は小麦製品を扱う環境で製造","menu":"豆腐米粉マフィン\n豆腐米粉ガトーショコラ","address":"岐阜県恵那市","googleMaps":"","thumb":"rucipio.svg","photos":"","website":"","instagram":"https://instagram.com/rucipio"},
+      {"id":4,"name":"くまさん家。のこめこぱん","category":"パン","tags":"小麦不使用,乳不使用,砂糖不使用,美腸活","short":"食べてキレイを叶える美腸活米粉パン","concept":"食べてキレイを叶える美腸活米粉パン","desc":"小麦・乳・砂糖 不使用で焼く美腸活米粉パン。自家製あま酒や味醂などを使って焼いているので自然な甘みを感じられる米粉パンです♪ 罪悪感なく美味しいパンを食べて欲しいそんな想いを込めてひとつひとつ丁寧に作っております。","targetCustomer":"アレルギーをお持ちの方はもちろん、米粉パンが好きな方、健康や美容のためにグルテンを控えている方に食べていただきたいです。","story":"食べること・料理をするのが大好きでとくにパンは大好物なわたしは以前、太ることが怖くてカロリー気にし、無理な食事制限、過度な運動で腸もお肌もボロボロでした。体重は落ちず毎日イライラ仕事で疲れ切って家庭もピリピリ。そんなときに腸活という言葉を知り出会ったのが米粉パンと発酵食品米粉パンと麹調味料の美味しさに魅了され米粉パンや麹調味を学び始めました。米粉パン・麹調味料を日々の食生活に取り入れ腸内環境が整い体重はみるみる落ちお肌もキレイになり家庭に笑顔が増えました♪","recommendation":"砂糖不使用で焼き上げる米粉パンや焼き菓子には自家製あま酒や味醂、アガベシロップをつかっているので、自然な甘さを楽しんでいただけます☺️✨また見た目も可愛らしく、美味しい米粉パンを焼いております♪特におにぎりパンや食パンは大人気メニューです🍀","allergyInfo":"乳製品","contamination":"③小麦を扱う調理場・普段は小麦製品を扱う環境で製造","menu":"米粉パン\n米粉の焼菓子","address":"名古屋市南区","googleMaps":"","thumb":"kumasan.svg","photos":"","website":"","instagram":"https://instagram.com/kumano_hakkousyoku"},
+      {"id":5,"name":"2525sweets","category":"スイーツ","tags":"8大アレルゲン不使用,専用調理場","short":"8大アレルゲン不使用の米粉フィナンシェ専門店","concept":"アレルギーのある人もない人もみんな一緒に美味しく楽しいお菓子の時間を♪","desc":"原材料は主に米粉、豆乳、米油、さとうきび糖、アーモンドプードル。身体に優しい素材を厳選し、小麦卵乳を持ち込まない専用キッチンで、1つ1つ丁寧に手作りしています。","targetCustomer":"食物アレルギーの影響で食べたいお菓子ではなく食べられるお菓子しか食べて来なかった方","story":"娘が生まれながらの重度の食物アレルギーで当時は食べられるお菓子はほとんどありませんでした。外食で行けるお店はほとんどなく、一緒に食べられるお菓子もありませんでした。お土産でお菓子をもらっても、自分だけ食べられない。お菓子売り場に行っても、たくさんのお菓子から好きなものを選ぶことはできず、ほんのわずかな食べられるものを買うしかありませんでした。お菓子は本来、みんなを笑顔にするもの。でも、食物アレルギーが原因でお菓子に楽しい思い出がない人もいます。アレルギーがある人もない人も、みんなが楽しく美味しい思い出を作ってもらいたい！そんな思いから、小麦粉・卵・乳を使用しないみんなで一緒に食べられるお菓子屋をはじめました。","recommendation":"米粉フィナンシェへたくさんの種類をご用意しています。プレーン、ココア、苺、宇治抹茶、アールグレイ、オレンジ、ピスタチオ、アーモンド、かぼちゃ、コーヒーなど10種類以上！好きなものを好きなだけ。お菓子と共に、選ぶ楽しさも味わってください！","allergyInfo":"8大アレルゲン不使用","contamination":"① 専用調理場・小麦・麦類を一切持ち込まない専用の調理場で製造","menu":"米粉フィナンシェ（10種類以上）","address":"愛知県名古屋市中区","googleMaps":"","thumb":"2525sweets.svg","photos":"","website":"","instagram":"https://instagram.com/2525sweets"},
+      {"id":6,"name":"菜食食堂ととと","category":"食事","tags":"動物性不使用,有機野菜,八大アレルゲン不使用","short":"動物性不使用の大判型グルテンフリーお好み焼き","concept":"野菜だけでも「ちゃんと美味しい！」を届けたい","desc":"動物性不使用、有機野菜で作り上げる大判型のお好み焼きです。グルテンフリーの方にも気軽に屋外でお好み焼きを楽しんでほしくて、大判のお好み焼きをご用意。誰もが一緒に楽しめて、人にも動物にも地球にも優しいひと皿をお届けします。","targetCustomer":"普段お祭りやマルシェの露店でお好み焼きを我慢している方","story":"私は普段、オーガニックの洋菓子を販売しています。その中でグルテンフリーの商品を扱ううちに、「グルテンフリーのお菓子を探していました」と喜んでくださるお客様にたくさん出会いました。私自身も菜食の暮らしをする中で、「食の制限があると選べるものが少ない」ことを感じてきました。でも本当は、制限がある人もない人も、同じ食事を分け合って楽しめる世界がもっと増えたら素敵だと思います。今回のグルテンフリーお好み焼きは、その第一歩。制限じゃなくて新しい楽しみ方として、皆さんにお届けできたら嬉しいです。","recommendation":"動物性不使用・グルテンフリー・有機＆国産食材で仕上げた、大判型のお好み焼きです。普段は食事に制限がある方も、そうでないご家族やご友人と一緒に安心して楽しんでいただけたら嬉しいです。私のお好み焼きが、そのひとときをつなぐ小さなお手伝いになれば幸せです。当日は制限を忘れて楽しめる、新しいお好み焼きを体験、味わって頂ければと思います。","allergyInfo":"八大アレルゲンは使用していません。大豆・りんごは含みます。","contamination":"③小麦を扱う調理場・普段は小麦製品を扱う環境で製造","menu":"大判型お好み焼き","address":"露店営業のみのため店舗はありません。","googleMaps":"","thumb":"tototo.svg","photos":"","website":"","instagram":"https://instagram.com/tototo.saishok"},
+      {"id":7,"name":"米粉パンケーキ sora 1-na cafe","category":"スイーツ,ドリンク","tags":"小麦不使用,国産米粉100%,専用調理場","short":"ふわふわ米粉パンケーキのキッチンカー","concept":"小麦アレルギーのある方も、そうでない方も、同じおやつを囲んで一緒に笑顔になってほしい。","desc":"ふわふわ米粉パンケーキのキッチンカーです。国産米粉100％使用、愛知県産「あいちのかおり」の米粉を使い、メレンゲでふっくらと焼き上げました。グルテンフリーで小麦アレルギーの方も安心。三河本みりんを使用した小倉など、地元素材も取り入れています。ぜひ焼きたてのおいしさをお楽しみください。","targetCustomer":"小麦アレルギーのある方はもちろん、どの方に召し上がっていただいても、美味しいと感じていただけるパンケーキを作ってます。お子さま連れのご家族や、やさしい甘さのおやつを求める方におすすめです。","story":"保育士として働いていた頃、アレルギーのある子どもたちに出会い、「みんなと同じおやつを食べたい」という純粋な願いに触れました。そんな気持ちに寄り添いたいとの想いから、米粉を使ったパンケーキ作りを始めました。小麦を使わなくても、ふわふわでやさしいおいしさを届けられるように、一枚一枚心を込めて丁寧に焼き上げています。家族やお友達と一緒に笑顔で楽しめる、そんなひとときをお届けできれば幸いです。","recommendation":"国産米粉100％でつくる、ふわふわでもっちりの新食感パンケーキです。米粉ならではの軽やかさと程よい食べごたえで、お腹も満足。小麦を使わなくても安心で美味しいひとときをお届けできるよう、一枚一枚丁寧に焼き上げています。やさしい甘さはお子さまにも大人にも好評で、ご家族やお友達と一緒に楽しむおやつにぴったり。笑顔あふれるカフェ気分を、キッチンカーからお届けします。","allergyInfo":"卵・乳は使用しています。キッチンカー内では麦類を一切扱わず、コンタミ防止に配慮しております。","contamination":"① 専用調理場・小麦・麦類を一切持ち込まない専用の調理場で製造","menu":"ふわふわ米粉のパンケーキ\nドリンク","address":"名古屋市港区","googleMaps":"","thumb":"sora1na.svg","photos":"","website":"","instagram":"https://instagram.com/sora_1na_cafe"},
+      {"id":8,"name":"米粉のおやつ ココカラ日和","category":"スイーツ","tags":"小麦不使用,たまご不使用,無農薬米粉","short":"無農薬米粉を使った身体に優しい焼き菓子","concept":"","desc":"無農薬の米粉をメインに、小麦粉・たまご・乳（乳製品はトッピングとして使用する場合あり）を生地には使用せず、オーガニックココナッツオイル・有機無調整豆乳などを使用した身体に優しい米粉のお菓子です。","targetCustomer":"小麦粉を食べることに慣れていて、米粉を食べ慣れない方や初めて食べる方にも、米粉って美味しいね！と言っていただけるとような食感や味を目指しています。","story":"米粉のお菓子を作る前は小麦粉などのお菓子を作っていました。マルシェが増えてるにつれてたくさんのお客様に会う機会も増えると、小麦粉やたまごが食べられないお客様やいらっしゃるのを知って、小麦粉を地元で穫れる米粉で作ることからはじまりました。14年くらい前でその頃はレシピ本もほとんどなくて、カチカチのクッキーを作ってしまうこともありました。笑 今では地元の田園風景を守ることにも繋がったらいいな。という思いも込めて米粉のお菓子を作っています。","recommendation":"朝焼きでお持ちするマフィンは、そのままでもふんわり。お家でリベイクしていただいて、さっくり＆ふんわり。冷蔵庫で冷やして、しっとりもっちり。といろいろな食感を楽しんでいただけます。お気に入りを見つけていただけたら嬉しいです。","allergyInfo":"小麦粉、たまご","contamination":"④小麦粉は使用していないが、小麦を含む調味料を使用している調理場","menu":"米粉の焼菓子（朝焼きマフィン、クッキーなど）","address":"愛知県知多郡阿久比町","googleMaps":"","thumb":"cocokara.svg","photos":"","website":"","instagram":"https://instagram.com/cocokara_biyori"},
+      {"id":9,"name":"やさしいスイーツカフェ corpo","category":"カフェ,スイーツ","tags":"グルテンフリー,専用調理場,白砂糖不使用","short":"グルテンフリーカフェ・創業9周年","concept":"グルテンフリーのカフェ アレルギーがあってもなくても、同じテーブルで安心してお食事やデザートが食べられる空間、場所を提供します","desc":"100%米粉のふわふわもちもち米粉パン、おからを使用した、しっとりとした食感が特徴のおからクッキー、てんさい糖やラカントを使用したパティシエ自慢のケーキ、タルト","targetCustomer":"アレルギーの方はもちろん、身近にアレルギーをお持ちの方や体の内側から変えたいと考えている方","story":"やさしいスイーツカフェ コルポは創業9周年。「からだにやさしく、心もほっとするスイーツを届けたい」との想いから生まれました。小麦や乳製品に制限がある方も安心して楽しめるよう、グルテンフリーを中心に素材にこだわったスイーツを丁寧に手づくりしています。また、障害があっても自分らしく働ける場をつくりたいとの願いも原点にあります。食べる人も働く人も笑顔になれる、地域に根ざしたカフェとして日々歩みを続けています。","recommendation":"コルポでは、店内で召し上がれるランチやデザート、全てグルテンフリーでご用意しております。アレルギーがある方もそうでない方も一緒に食卓を囲み、楽しい時間を過ごしていただける場所を提供します！また、ケーキやタルトは旬のフルーツを仕入れており白砂糖不使用で、罪悪感なく食べられるよう仕上げております。そして、コルポ自慢！毎朝焼きたての米粉パンはお子さまにも大人気です。季節限定フレーバーもお楽しみください。","allergyInfo":"米粉パンのプレーン味は、小麦に加えて卵・乳製品も不使用で作っております また、ホールタルトのみ8大アレルゲン不使用の商品をご用意しております（3日前までの要予約）","contamination":"① 専用調理場・小麦・麦類を一切持ち込まない専用の調理場で製造","menu":"米粉パン\n焼き菓子\nカットケーキ","address":"愛知県名古屋市中川区","googleMaps":"","thumb":"corpo.svg","photos":"","website":"","instagram":"https://instagram.com/corpo_pr"},
+      {"id":10,"name":"bagel haruhana","category":"パン","tags":"小麦不使用,卵不使用,乳不使用,専用調理場","short":"グルテンフリー米粉ベーグル専門店","concept":"アレルギーがあってもなくてもみんなで同じ食卓を囲める幸せがふえますように","desc":"小麦・卵・乳を使わないグルテンフリーの米粉パンです。また、製造キッチンには「小麦・たまご・乳を持ち込まない」を徹底しているため、アレルギーもある方にも安心して手に取っていただける商品です。","targetCustomer":"小麦アレルギー・卵アレルギー・乳アレルギーをお持ちの小さなお子さんから大人の方まで。アレルギーがあることで美味しいパンを食べることを諦めていた全ての方に笑顔になってもらいたい","story":"アレルギーのあった我が子に、みんなと同じようにキャラクター（アンパンマン）のスティックパンを食べさせてあげたい！っと思ったことから、私の米粉パン作りが始まりました。私の作った米粉パンを嬉しそうに食べてくれている我が子の姿をみて『自分と同じような境遇の方へ米粉パン作りを伝えることがわたしの使命だ！』と思い教室を始めました。多くの生徒様とお話をさせていただく中で、もっと気軽に米粉パンを買える場所の必要性を強く感じ、全国への通信販売・マルシェ出店からスタートし、現在は「地元名古屋からグルテンフリーの米粉パンの美味しさ広める！」を掲げ、２５年４月に実店舗をオープンしました。","recommendation":"パンに合わせる食材は、その季節の旬を大切して、できる限り無農薬・減農薬にこだわって選び、季節限定のフレーバーなど多数ご用意しています。また、米粉ベーグル専門店として始めたはるのはなですが、今ではカンパーニュや塩パンなどのハード系や、メロンパン，シナモンロールなどの甘い系のパンもとても人気です♪ 【アレルギーがあっても選べる楽しみ】を感じながら、あなたのお気に入りのパンをぜひ見つけてみてください⭐︎","allergyInfo":"卵・乳乳製品不使用。調味料にもアレルゲン不使用。（原材料にはアレルゲンと同一製造ラインのものあり。原材料製造工程まで追いきれないものもあり、コンタミの可能性は全ての商品で記載しています）","contamination":"① 専用調理場・小麦・麦類を一切持ち込まない専用の調理場で製造","menu":"米粉パン","address":"名古屋市千種区","googleMaps":"","thumb":"haruhana.svg","photos":"","website":"","instagram":"https://instagram.com/bagel_haruhana"}
+    ];
+
+    // データ管理
+    let shops = JSON.parse(localStorage.getItem('completeShops') || 'null');
+    if (!shops || shops.length === 0) {
+      shops = initialData;
+      localStorage.setItem('completeShops', JSON.stringify(shops));
+    }
+    
+    // 初期化
+    window.onload = function() {
+      displayShops();
+      
+      document.getElementById('add-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        addShop();
+      });
+      
+      document.getElementById('edit-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        updateShop();
+      });
+    };
+    
+    // セクション表示
+    function showSection(section) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById('section-' + section).classList.add('active');
+    }
+    
+    // 店舗一覧表示
+    function displayShops() {
+      const grid = document.getElementById('shops-grid');
+      
+      if (shops.length === 0) {
+        grid.innerHTML = '<p>まだ店舗が登録されていません。</p>';
+        return;
+      }
+      
+      grid.innerHTML = shops.map(shop => `
+        <div class="shop-card">
+          <h3>${shop.name}</h3>
+          <div class="shop-info"><strong>カテゴリ:</strong> ${shop.category || '未設定'}</div>
+          <div class="shop-info"><strong>説明:</strong> ${shop.short || '未設定'}</div>
+          <div class="shop-info"><strong>住所:</strong> ${shop.address || '未設定'}</div>
+          <div class="shop-info"><strong>タグ:</strong> ${shop.tags || '未設定'}</div>
+          ${shop.concept ? `<div class="shop-info"><strong>コンセプト:</strong> <div class="long-text" onclick="toggleExpand(this)">${shop.concept} <span class="expand-btn">...続きを読む</span></div></div>` : ''}
+          ${shop.allergyInfo ? `<div class="shop-info"><strong>アレルギー:</strong> ${shop.allergyInfo}</div>` : ''}
+          ${shop.contamination ? `<div class="shop-info"><strong>コンタミ対応:</strong> ${shop.contamination.substring(0, 20)}...</div>` : ''}
+          <div class="shop-actions">
+            <button class="btn-edit" onclick="editShop(${shop.id})">✏️ 編集</button>
+            <button class="btn-delete" onclick="deleteShop(${shop.id})">🗑️ 削除</button>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    // テキスト展開
+    function toggleExpand(element) {
+      element.classList.toggle('expanded');
+      const btn = element.querySelector('.expand-btn');
+      if (element.classList.contains('expanded')) {
+        btn.textContent = '...閉じる';
+      } else {
+        btn.textContent = '...続きを読む';
+      }
+    }
+    
+    // 店舗追加
+    function addShop() {
+      const name = document.getElementById('add-name').value.trim();
+      if (!name) {
+        alert('店舗名を入力してください');
+        return;
+      }
+      
+      const shop = {
+        id: Date.now(),
+        name: name,
+        short: document.getElementById('add-short').value.trim(),
+        concept: document.getElementById('add-concept').value.trim(),
+        desc: document.getElementById('add-desc').value.trim(),
+        targetCustomer: document.getElementById('add-targetCustomer').value.trim(),
+        story: document.getElementById('add-story').value.trim(),
+        recommendation: document.getElementById('add-recommendation').value.trim(),
+        category: document.getElementById('add-category').value.trim(),
+        tags: document.getElementById('add-tags').value.trim(),
+        allergyInfo: document.getElementById('add-allergyInfo').value.trim(),
+        contamination: document.getElementById('add-contamination').value.trim(),
+        menu: document.getElementById('add-menu').value.trim(),
+        address: document.getElementById('add-address').value.trim(),
+        googleMaps: document.getElementById('add-googleMaps').value.trim(),
+        thumb: document.getElementById('add-thumb').value.trim(),
+        photos: document.getElementById('add-photos').value.trim(),
+        website: document.getElementById('add-website').value.trim(),
+        instagram: document.getElementById('add-instagram').value.trim()
+      };
+      
+      shops.push(shop);
+      localStorage.setItem('completeShops', JSON.stringify(shops));
+      
+      document.getElementById('add-form').reset();
+      displayShops();
+      alert('✅ 店舗を登録しました！');
+      showSection('list');
+    }
+    
+    // 店舗編集
+    function editShop(id) {
+      const shop = shops.find(s => s.id === id);
+      if (!shop) return;
+      
+      document.getElementById('edit-id').value = shop.id;
+      document.getElementById('edit-name').value = shop.name;
+      document.getElementById('edit-short').value = shop.short || '';
+      document.getElementById('edit-concept').value = shop.concept || '';
+      document.getElementById('edit-desc').value = shop.desc || '';
+      document.getElementById('edit-targetCustomer').value = shop.targetCustomer || '';
+      document.getElementById('edit-story').value = shop.story || '';
+      document.getElementById('edit-recommendation').value = shop.recommendation || '';
+      document.getElementById('edit-category').value = shop.category || '';
+      document.getElementById('edit-tags').value = shop.tags || '';
+      document.getElementById('edit-allergyInfo').value = shop.allergyInfo || '';
+      document.getElementById('edit-contamination').value = shop.contamination || '';
+      document.getElementById('edit-menu').value = shop.menu || '';
+      document.getElementById('edit-address').value = shop.address || '';
+      document.getElementById('edit-googleMaps').value = shop.googleMaps || '';
+      document.getElementById('edit-thumb').value = shop.thumb || '';
+      document.getElementById('edit-photos').value = shop.photos || '';
+      document.getElementById('edit-website').value = shop.website || '';
+      document.getElementById('edit-instagram').value = shop.instagram || '';
+      
+      document.getElementById('edit-modal').style.display = 'block';
+    }
+    
+    // 店舗更新
+    function updateShop() {
+      const id = parseInt(document.getElementById('edit-id').value);
+      const name = document.getElementById('edit-name').value.trim();
+      
+      if (!name) {
+        alert('店舗名を入力してください');
+        return;
+      }
+      
+      const shopIndex = shops.findIndex(s => s.id === id);
+      if (shopIndex === -1) return;
+      
+      shops[shopIndex] = {
+        id: id,
+        name: name,
+        short: document.getElementById('edit-short').value.trim(),
+        concept: document.getElementById('edit-concept').value.trim(),
+        desc: document.getElementById('edit-desc').value.trim(),
+        targetCustomer: document.getElementById('edit-targetCustomer').value.trim(),
+        story: document.getElementById('edit-story').value.trim(),
+        recommendation: document.getElementById('edit-recommendation').value.trim(),
+        category: document.getElementById('edit-category').value.trim(),
+        tags: document.getElementById('edit-tags').value.trim(),
+        allergyInfo: document.getElementById('edit-allergyInfo').value.trim(),
+        contamination: document.getElementById('edit-contamination').value.trim(),
+        menu: document.getElementById('edit-menu').value.trim(),
+        address: document.getElementById('edit-address').value.trim(),
+        googleMaps: document.getElementById('edit-googleMaps').value.trim(),
+        thumb: document.getElementById('edit-thumb').value.trim(),
+        photos: document.getElementById('edit-photos').value.trim(),
+        website: document.getElementById('edit-website').value.trim(),
+        instagram: document.getElementById('edit-instagram').value.trim()
+      };
+      
+      localStorage.setItem('completeShops', JSON.stringify(shops));
+      displayShops();
+      closeEditModal();
+      alert('✅ 店舗情報を更新しました！');
+    }
+    
+    // 店舗削除
+    function deleteShop(id) {
+      const shop = shops.find(s => s.id === id);
+      if (!shop) return;
+      
+      if (!confirm(`「${shop.name}」を削除しますか？`)) return;
+      
+      shops = shops.filter(s => s.id !== id);
+      localStorage.setItem('completeShops', JSON.stringify(shops));
+      displayShops();
+      alert('✅ 店舗を削除しました！');
+    }
+    
+    // モーダルを閉じる
+    function closeEditModal() {
+      document.getElementById('edit-modal').style.display = 'none';
+    }
+    
+    // データエクスポート
+    function exportData() {
+      if (shops.length === 0) {
+        alert('エクスポートするデータがありません');
+        return;
+      }
+      
+      const jsonStr = JSON.stringify(shops, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'complete-shops-' + new Date().toISOString().slice(0,10) + '.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      alert(`✅ ${shops.length}件のデータをエクスポートしました`);
+    }
+  </script>
+</body>
+</html>
