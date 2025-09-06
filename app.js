@@ -34,6 +34,24 @@ function convertImagePath(imagePath) {
   return 'assets/placeholder.svg';
 }
 
+// Enhanced image error handling
+function handleImageError(img, fallbackSrc = 'assets/placeholder.svg') {
+  if (img.src !== fallbackSrc) {
+    console.log(`Image failed to load: ${img.src}, switching to ${fallbackSrc}`);
+    img.src = fallbackSrc;
+  }
+}
+
+// Preload and validate image URLs
+async function validateImageUrl(url) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
+    img.src = url;
+  });
+}
+
 async function init() {
   try {
     await loadShopsData();
@@ -309,9 +327,7 @@ function renderShops(shops) {
     let cardImage = 'assets/placeholder.svg';
     if (shop.thumb && typeof shop.thumb === 'string' && shop.thumb.trim() !== '') {
       const trimmedThumb = shop.thumb.trim();
-      console.log('Processing thumb for', shop.name, ':', trimmedThumb);
       const thumbUrl = convertImagePath(trimmedThumb);
-      console.log('Converted to:', thumbUrl);
       if (thumbUrl && thumbUrl !== 'assets/placeholder.svg') {
         cardImage = thumbUrl;
       }
@@ -323,7 +339,8 @@ function renderShops(shops) {
           <img src="${cardImage}" 
                alt="${shop.name}" 
                loading="lazy"
-               onerror="this.src='assets/placeholder.svg'">
+               onerror="handleImageError(this)"
+               onload="console.log('Image loaded successfully:', this.src)">
         </div>
         <div class="shop-card-body">
           ${categoryDisplay}
@@ -394,7 +411,7 @@ function openModal(shopId) {
     <div class="modal-header">
       <div class="modal-images">
         <div class="modal-image-main">
-          <img src="${mainPhoto}" alt="${shop.name}" id="modal-main-image">
+          <img src="${mainPhoto}" alt="${shop.name}" id="modal-main-image" onerror="handleImageError(this)">
           ${allImages.length > 1 ? `
             <div class="modal-image-nav">
               <button class="modal-nav-btn prev" id="modal-nav-prev" aria-label="前の画像">‹</button>
@@ -409,7 +426,7 @@ function openModal(shopId) {
           <div class="modal-image-thumbs">
             ${allImages.map((photo, index) => `
               <div class="modal-image-thumb ${index === 0 ? 'active' : ''}" data-image="${photo}" data-index="${index}">
-                <img src="${photo}" alt="${shop.name} ${index + 1}">
+                <img src="${photo}" alt="${shop.name} ${index + 1}" onerror="handleImageError(this)">
               </div>
             `).join('')}
           </div>
