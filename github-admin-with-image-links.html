@@ -624,15 +624,30 @@ function loadShops() {
   const statusDiv = document.getElementById('status');
   statusDiv.innerHTML = '<span class="loading"></span>店舗データを読み込んでいます...';
   
-  fetch(API_BASE + '/shops')
-    .then(response => response.json())
+  fetch(API_BASE + '/shops', {
+    method: 'GET',
+    mode: 'cors',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }
+  })
+    .then(response => {
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
     .then(data => {
+      console.log('Data loaded successfully:', data.length, 'shops');
       shops = data;
       displayShops();
     })
     .catch(error => {
-      console.error('Error:', error);
-      statusDiv.innerHTML = '<span class="error">❌ データ読み込みエラー</span>';
+      console.error('詳細エラー:', error);
+      statusDiv.innerHTML = `<span class="error">❌ データ読み込みエラー: ${error.message}</span><br><small>詳細はブラウザのコンソールを確認してください</small>`;
     });
 }
 
