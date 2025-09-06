@@ -71,9 +71,13 @@ function setupStorageListener() {
   // Listen for localStorage changes from admin panel
   window.addEventListener('storage', (e) => {
     if (e.key === 'completeShops' && e.newValue) {
-      console.log('Detected admin panel update, refreshing shops data...');
+      console.log('Detected admin panel update from another tab, refreshing...');
       try {
         state.shops = JSON.parse(e.newValue);
+        // Clear current filters and refresh everything
+        state.filters.categories = [];
+        state.filters.tags = [];
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
         setupFilters();
         renderShops(state.shops);
         
@@ -85,17 +89,40 @@ function setupStorageListener() {
     }
   });
   
-  // Also check periodically for same-tab updates (when admin panel is in iframe, etc.)
+  // Check periodically for same-tab updates
   let lastDataHash = getDataHash();
+  console.log('Initial data hash:', lastDataHash);
+  
   setInterval(async () => {
     const currentDataHash = getDataHash();
+    const localData = localStorage.getItem('completeShops');
+    
+    // Debug logging
+    if (localData) {
+      const shops = JSON.parse(localData);
+      console.log('Checking for updates - Current shops count:', shops.length, 'Hash:', currentDataHash);
+    }
+    
     if (currentDataHash !== lastDataHash) {
-      console.log('Detected local data change, refreshing...');
+      console.log('Data changed! Old hash:', lastDataHash, 'New hash:', currentDataHash);
+      console.log('Refreshing everything...');
+      
+      // Reload data completely
       await loadShopsData();
+      
+      // Clear filters and rebuild UI
+      state.filters.categories = [];
+      state.filters.tags = [];
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      
+      // Rebuild everything
       setupFilters();
       renderShops(state.shops);
+      
       lastDataHash = currentDataHash;
       showUpdateNotification();
+      
+      console.log('Refresh complete. New shops count:', state.shops.length);
     }
   }, 2000); // Check every 2 seconds
 }
