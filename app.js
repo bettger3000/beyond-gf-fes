@@ -102,7 +102,16 @@ function setupStorageListener() {
 
 function getDataHash() {
   const data = localStorage.getItem('completeShops');
-  return data ? btoa(data).substring(0, 20) : '';
+  if (!data) return '';
+  
+  // Use a simple hash function for Japanese text support
+  let hash = 0;
+  for (let i = 0; i < data.length; i++) {
+    const char = data.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return hash.toString(36);
 }
 
 function showUpdateNotification() {
