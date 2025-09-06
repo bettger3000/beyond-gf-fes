@@ -160,6 +160,26 @@ body { font-family: 'Hiragino Sans', 'Yu Gothic', Arial, sans-serif; background:
         <label>コンセプト</label>
         <textarea id="add-concept" placeholder="お店のコンセプトや想い"></textarea>
       </div>
+
+      <div class="form-group">
+        <label>詳細説明</label>
+        <textarea id="add-desc" placeholder="お店の詳しい説明"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>ターゲット客層</label>
+        <textarea id="add-targetCustomer" placeholder="どのようなお客様に来ていただきたいか"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>ストーリー・背景</label>
+        <textarea id="add-story" placeholder="お店を始めたきっかけや背景"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>おすすめポイント</label>
+        <textarea id="add-recommendation" placeholder="お客様におすすめしたいポイント"></textarea>
+      </div>
       
       <!-- カテゴリ・タグ -->
       <div class="form-section">
@@ -207,12 +227,47 @@ body { font-family: 'Hiragino Sans', 'Yu Gothic', Arial, sans-serif; background:
         </div>
       </div>
       
+      <!-- アレルギー・コンタミ情報 -->
+      <div class="form-section">
+        <div class="form-section-title">🚨 アレルギー・コンタミ情報</div>
+        
+        <div class="form-group">
+          <label>アレルギー情報</label>
+          <textarea id="add-allergyInfo" placeholder="含まれるアレルゲンや注意事項（例：卵・乳製品）"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label>コンタミネーション対応</label>
+          <select id="add-contamination">
+            <option value="">選択してください</option>
+            <option value="① 専用調理場・小麦・麦類を一切持ち込まない専用の調理場で製造">① 専用調理場・小麦・麦類を一切持ち込まない専用の調理場で製造</option>
+            <option value="③小麦を扱う調理場・普段は小麦製品を扱う環境で製造">③小麦を扱う調理場・普段は小麦製品を扱う環境で製造</option>
+            <option value="④小麦粉は使用していないが、小麦を含む調味料を使用している調理場">④小麦粉は使用していないが、小麦を含む調味料を使用している調理場</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- メニュー情報 -->
+      <div class="form-section">
+        <div class="form-section-title">🍽️ メニュー情報</div>
+        <div class="form-group">
+          <label>メニュー（JSON形式）</label>
+          <textarea id="add-menu" rows="5" placeholder='[{"name":"商品名1","price":"価格1"},{"name":"商品名2","price":"価格2"}]'></textarea>
+          <small style="color:#666;">例: [{"name":"米粉パン","price":"300円"},{"name":"ケーキ","price":"500円"}]</small>
+        </div>
+      </div>
+
       <!-- アクセス情報 -->
       <div class="form-section">
-        <div class="form-section-title">📍 基本情報</div>
+        <div class="form-section-title">📍 アクセス情報</div>
         <div class="form-group">
           <label>住所</label>
           <input type="text" id="add-address" placeholder="例: 東京都渋谷区...">
+        </div>
+        
+        <div class="form-group">
+          <label>Google Maps URL</label>
+          <input type="url" id="add-googleMaps" placeholder="https://maps.google.com/...">
         </div>
         
         <div class="form-row">
@@ -271,6 +326,26 @@ body { font-family: 'Hiragino Sans', 'Yu Gothic', Arial, sans-serif; background:
           <label>コンセプト</label>
           <textarea id="edit-concept" placeholder="お店のコンセプトや想い"></textarea>
         </div>
+
+        <div class="form-group">
+          <label>詳細説明</label>
+          <textarea id="edit-desc" placeholder="お店の詳しい説明"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>ターゲット客層</label>
+          <textarea id="edit-targetCustomer" placeholder="どのようなお客様に来ていただきたいか"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>ストーリー・背景</label>
+          <textarea id="edit-story" placeholder="お店を始めたきっかけや背景"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>おすすめポイント</label>
+          <textarea id="edit-recommendation" placeholder="お客様におすすめしたいポイント"></textarea>
+        </div>
         
         <!-- カテゴリ・タグ -->
         <div class="form-section">
@@ -318,12 +393,47 @@ body { font-family: 'Hiragino Sans', 'Yu Gothic', Arial, sans-serif; background:
           </div>
         </div>
         
+        <!-- アレルギー・コンタミ情報 -->
+        <div class="form-section">
+          <div class="form-section-title">🚨 アレルギー・コンタミ情報</div>
+          
+          <div class="form-group">
+            <label>アレルギー情報</label>
+            <textarea id="edit-allergyInfo" placeholder="含まれるアレルゲンや注意事項（例：卵・乳製品）"></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label>コンタミネーション対応</label>
+            <select id="edit-contamination">
+              <option value="">選択してください</option>
+              <option value="① 専用調理場・小麦・麦類を一切持ち込まない専用の調理場で製造">① 専用調理場・小麦・麦類を一切持ち込まない専用の調理場で製造</option>
+              <option value="③小麦を扱う調理場・普段は小麦製品を扱う環境で製造">③小麦を扱う調理場・普段は小麦製品を扱う環境で製造</option>
+              <option value="④小麦粉は使用していないが、小麦を含む調味料を使用している調理場">④小麦粉は使用していないが、小麦を含む調味料を使用している調理場</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- メニュー情報 -->
+        <div class="form-section">
+          <div class="form-section-title">🍽️ メニュー情報</div>
+          <div class="form-group">
+            <label>メニュー（JSON形式）</label>
+            <textarea id="edit-menu" rows="5" placeholder='[{"name":"商品名1","price":"価格1"},{"name":"商品名2","price":"価格2"}]'></textarea>
+            <small style="color:#666;">例: [{"name":"米粉パン","price":"300円"},{"name":"ケーキ","price":"500円"}]</small>
+          </div>
+        </div>
+
         <!-- アクセス情報 -->
         <div class="form-section">
-          <div class="form-section-title">📍 基本情報</div>
+          <div class="form-section-title">📍 アクセス情報</div>
           <div class="form-group">
             <label>住所</label>
             <input type="text" id="edit-address" placeholder="例: 東京都渋谷区...">
+          </div>
+          
+          <div class="form-group">
+            <label>Google Maps URL</label>
+            <input type="url" id="edit-googleMaps" placeholder="https://maps.google.com/...">
           </div>
           
           <div class="form-row">
@@ -513,11 +623,19 @@ function showEditModal(shop) {
   document.getElementById('edit-name').value = shop.name || '';
   document.getElementById('edit-short').value = shop.short || '';
   document.getElementById('edit-concept').value = shop.concept || '';
+  document.getElementById('edit-desc').value = shop.desc || '';
+  document.getElementById('edit-targetCustomer').value = shop.targetCustomer || '';
+  document.getElementById('edit-story').value = shop.story || '';
+  document.getElementById('edit-recommendation').value = shop.recommendation || '';
   document.getElementById('edit-address').value = shop.address || '';
+  document.getElementById('edit-googleMaps').value = shop.googleMaps || '';
   document.getElementById('edit-thumb').value = shop.thumb || '';
   document.getElementById('edit-photos').value = shop.photos ? shop.photos.join('\n') : '';
   document.getElementById('edit-site').value = shop.links?.site || '';
   document.getElementById('edit-instagram').value = shop.links?.instagram || '';
+  document.getElementById('edit-allergyInfo').value = Array.isArray(shop.allergyInfo) ? shop.allergyInfo.join(', ') : (shop.allergyInfo || '');
+  document.getElementById('edit-contamination').value = shop.contamination || '';
+  document.getElementById('edit-menu').value = shop.menu ? JSON.stringify(shop.menu, null, 2) : '';
   
   // サムネイルプレビュー設定
   const preview = document.getElementById('edit-thumb-preview');
@@ -706,15 +824,39 @@ function addShop() {
   const photosText = document.getElementById('add-photos').value.trim();
   const photos = photosText ? photosText.split('\n').map(p => p.trim()).filter(p => p) : [];
   
+  // メニューのJSONパース
+  let menu = [];
+  const menuText = document.getElementById('add-menu').value.trim();
+  if (menuText) {
+    try {
+      menu = JSON.parse(menuText);
+    } catch (e) {
+      alert('メニュー情報のJSON形式が正しくありません');
+      return;
+    }
+  }
+  
+  // アレルギー情報の処理
+  const allergyInfoText = document.getElementById('add-allergyInfo').value.trim();
+  const allergyInfo = allergyInfoText ? allergyInfoText.split(',').map(item => item.trim()).filter(item => item) : [];
+  
   const shopData = {
     name: name,
     short: document.getElementById('add-short').value.trim(),
     concept: document.getElementById('add-concept').value.trim(),
+    desc: document.getElementById('add-desc').value.trim(),
+    targetCustomer: document.getElementById('add-targetCustomer').value.trim(),
+    story: document.getElementById('add-story').value.trim(),
+    recommendation: document.getElementById('add-recommendation').value.trim(),
     category: categories,
     tags: tags,
     address: document.getElementById('add-address').value.trim(),
+    googleMaps: document.getElementById('add-googleMaps').value.trim(),
     thumb: document.getElementById('add-thumb').value.trim(),
     photos: photos,
+    allergyInfo: allergyInfo,
+    contamination: document.getElementById('add-contamination').value.trim(),
+    menu: menu,
     links: {
       site: document.getElementById('add-site').value.trim(),
       instagram: document.getElementById('add-instagram').value.trim()
@@ -870,15 +1012,39 @@ function updateShop() {
   const photosText = document.getElementById('edit-photos').value.trim();
   const photos = photosText ? photosText.split('\n').map(p => p.trim()).filter(p => p) : [];
   
+  // メニューのJSONパース
+  let menu = [];
+  const menuText = document.getElementById('edit-menu').value.trim();
+  if (menuText) {
+    try {
+      menu = JSON.parse(menuText);
+    } catch (e) {
+      alert('メニュー情報のJSON形式が正しくありません');
+      return;
+    }
+  }
+  
+  // アレルギー情報の処理
+  const allergyInfoText = document.getElementById('edit-allergyInfo').value.trim();
+  const allergyInfo = allergyInfoText ? allergyInfoText.split(',').map(item => item.trim()).filter(item => item) : [];
+  
   const shopData = {
     name: name,
     short: document.getElementById('edit-short').value.trim(),
     concept: document.getElementById('edit-concept').value.trim(),
+    desc: document.getElementById('edit-desc').value.trim(),
+    targetCustomer: document.getElementById('edit-targetCustomer').value.trim(),
+    story: document.getElementById('edit-story').value.trim(),
+    recommendation: document.getElementById('edit-recommendation').value.trim(),
     category: categories,
     tags: tags,
     address: document.getElementById('edit-address').value.trim(),
+    googleMaps: document.getElementById('edit-googleMaps').value.trim(),
     thumb: document.getElementById('edit-thumb').value.trim(),
     photos: photos,
+    allergyInfo: allergyInfo,
+    contamination: document.getElementById('edit-contamination').value.trim(),
+    menu: menu,
     links: {
       site: document.getElementById('edit-site').value.trim(),
       instagram: document.getElementById('edit-instagram').value.trim()
